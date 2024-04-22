@@ -8,113 +8,50 @@
     <link rel="stylesheet" href="../static/style.css">
     <title>Document</title>
 </head>
-<body>
-    <nav class="sidebar">
-        <header>
-            <div class="image-text">
-                    <span class="agrcentrado">
-                        <img class="lg" src="../static/logo.png">
-                    </span>
-                <!-- <div class="text header-text">
-                    <span class="name">Academic Dropout Prediction</span>
-                    <span class="profession">Admin</span>
-                </div> -->
-            </div>
-        </header>
-        <div class="menu-bar">
-            <div class="menu">
-                <ul class="menu-links" style="padding-left: 0;">
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-eye-fill icon"></i>
-                            <span class="text nav-text">Prever</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-diagram-3-fill icon"></i>
-                            <span class="text nav-text">Modelar</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-file-earmark-text-fill icon"></i>
-                            <span class="text nav-text">Gestão de dados</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-gear-fill icon"></i>
-                            <span class="text nav-text">Definições</span>
-                        </a>
-                    </li>
-                    
-
-        </div>
-    </nav>
+{% extends 'sidebarbase.html' %}
+{% block body %}
     <section class="home">
         <div class="container my-5">
             <h4 style="margin-left:20px">Previsão de abandono escolar</h4>
             <br>
             <br>
+            <form action="{{ url_for('desativar') }}" method="POST">
             <div class="container">
                 <div class="row">
                   <div class="col-12">
+                    
                     <table class="table table-bordered">
                       <thead>
                         <tr>
-                          <th scope="col">Select Day</th>
-                          <th scope="col">Article Name</th>
-                          <th scope="col">Author</th>
-                          <th scope="col">Words</th>
-                          <th scope="col">Shares</th>
+                          <th scope="col"></th>
+                          {% for column in columns %}
+                            <th scope="col">{{ column }}</th>
+                          {% endfor %}
                         </tr>
                       </thead>
                       <tbody>
+                        {% for row in data %}
                         <tr>
                           <td>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck1" checked>
-                                <label class="custom-control-label" for="customCheck1">1</label>
+                                <input type="checkbox" class="custom-control-input" id="{{ row.id }}" {% if row.estado == 1 %}checked{% endif %}>
                             </div>
                           </td>
-                          <td>Bootstrap 4 CDN and Starter Template</td>
-                          <td>Cristina</td>
-                          <td>913</td>
-                          <td>2.846</td>
+                          {% for item in row %}
+                            
+                            <td>{{ item }}</td>
+                          {% endfor %}
                         </tr>
-                        <tr>
-                          <td>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck2">
-                                <label class="custom-control-label" for="customCheck2">2</label>
-                            </div>
-                          </td>
-                          <td>Bootstrap Grid 4 Tutorial and Examples</td>
-                          <td>Cristina</td>
-                          <td>1.434</td>
-                          <td>3.417</td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck3">
-                                <label class="custom-control-label" for="customCheck3">3</label>
-                            </div>
-                          </td>
-                          <td>Bootstrap Flexbox Tutorial and Examples</td>
-                          <td>Cristina</td>
-                          <td>1.877</td>
-                          <td>1.234</td>
-                        </tr>
+                        {% endfor %}
+                        
                       </tbody>
                       
                     </table>
                     
                   </div>
-                  <input style="margin:auto;width:30%;background:#BED7EA" class="btn btn-light"type="submit">
+                  <input style="margin:auto;width:30%;background:#BED7EA" class="btn btn-light" type="submit">
                 </div>
-                
+                </form>
               </div>
               
         </div>
@@ -125,3 +62,4 @@
 
 </body>
 </html>
+{% endblock %}

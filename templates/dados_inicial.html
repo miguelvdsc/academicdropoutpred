@@ -8,50 +8,8 @@
     <link rel="stylesheet" href="../static/style.css">
     <title>Document</title>
 </head>
-<body>
-    <nav class="sidebar">
-        <header>
-            <div class="image-text">
-                    <span class="agrcentrado">
-                        <img class="lg" src="../static/logo.png">
-                    </span>
-                <!-- <div class="text header-text">
-                    <span class="name">Academic Dropout Prediction</span>
-                    <span class="profession">Admin</span>
-                </div> -->
-            </div>
-        </header>
-        <div class="menu-bar">
-            <div class="menu">
-                <ul class="menu-links" style="padding-left: 0;">
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-eye-fill icon"></i>
-                            <span class="text nav-text">Prever</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-diagram-3-fill icon"></i>
-                            <span class="text nav-text">Modelar</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-file-earmark-text-fill icon"></i>
-                            <span class="text nav-text">Gestão de dados</span>
-                        </a>
-                    </li>
-                    <li class="nav-link">
-                        <a href="#">
-                            <i class="bi bi-gear-fill icon"></i>
-                            <span class="text nav-text">Definições</span>
-                        </a>
-                    </li>
-                    
-
-        </div>
-    </nav>
+{% extends 'sidebarbase.html' %}
+{% block body %}
     <section class="home">
         <div class="container my-5">
             <h4 style="margin-left:20px">Dados</h4>
@@ -59,8 +17,8 @@
             <br>
             <div class="text-center">
                 <div class="d-grid gap-2 col-6 mx-auto">
-                    <a class="btn btn-light" style="background:#BED7EA" type="button">Carregar novo dataset</a>
-                    <a class="btn btn-light" style="background:#BED7EA" type="button">Selecionar dataset</a>
+                    <a href="{{ url_for('dados_upload_file') }}" class="btn btn-light" style="background:#BED7EA" type="button">Carregar novo dataset</a>
+                    <a href="{{ url_for('dados_select_dataset') }}" class="btn btn-light" style="background:#BED7EA" type="button">Selecionar dataset</a>
                   </div>
 
         </div>
@@ -71,3 +29,4 @@
 
 </body>
 </html>
+{% endblock %}

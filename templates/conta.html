@@ -12,13 +12,13 @@
 {% block body %}
     <section class="home">
         <div class="container my-5">
-            <h4 style="margin-left:20px">Previsão de abandono escolar</h4>
+            <h4 style="margin-left:20px">Conta</h4>
             <br>
             <br>
             <div class="text-center">
                 <div class="d-grid gap-2 col-6 mx-auto">
-                    <button class="btn btn-light" style="background:#BED7EA" type="button">Fazer Previsão</button>
-                    <button class="btn btn-light" style="background:#BED7EA" type="button">Visualizar Previsões anteriores</button>
+                    <a href="{{ url_for('logout')}}" class="btn btn-light" style="background:#BED7EA" type="button">Terminar Sessão</a>
+                    <a href="{{ url_for('changepw')}}" class="btn btn-light" style="background:#BED7EA" type="button">Mudar Palavra-passe</a>
                   </div>
 
         </div>

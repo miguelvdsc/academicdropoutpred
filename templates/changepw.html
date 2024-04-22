@@ -29,17 +29,9 @@
       
         <div class="register-container">
             <div class="register-header">
-              <h2>Register</h2>
+              <h2>Mudar Palavra-passe</h2>
             </div>
-            <form action="{{ url_for('handle_register') }}" method="POST">
-              <div class="mb-3">
-                <label for="fullname" class="form-label">Nome</label>
-                <input type="text" class="form-control" name="name" id="name" placeholder="Enter your full name">
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email">
-              </div>
+            <form action="{{ url_for('changepass') }}" method="POST">
               <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password">
@@ -48,10 +40,7 @@
                 <label for="confirm-password" class="form-label">Confirm Password</label>
                 <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="Confirm your password">
               </div>
-              <div class="mb-3">
-                <label for="tipo" class="form-label">Cargo</label>
-                <input type="text" class="form-control" name="cargo" id="tipo" placeholder="Cargo">
-              </div>
+            
               <button type="submit" class="btn btn-light w-100">Register</button>
             </form>
           </div>
