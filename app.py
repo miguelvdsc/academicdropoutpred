@@ -2,7 +2,8 @@ from flask import Flask, redirect, render_template, request, url_for
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 import sqlalchemy
 
-from Modulos.database import change_password, check_if_user_exists, check_pass, login_query, register_user, select_from_table, select_from_table_id_one_dataset, select_head_dataset, store_dataset
+from Modulos.cleaning import translate_categorical_variables
+from Modulos.database import change_password, check_if_user_exists, check_pass, login_query, register_user, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, store_dataset
 from Modulos.database import modify_estado
 
 app = Flask(__name__)
@@ -156,7 +157,55 @@ def show_dataset():
             lengc=len(columns_five)
             dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
             lengd=len(dd)
-            return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=data_five,columns_five=columns_five,lengc=lengc,lengd=lengd)
+            transdf=translate_categorical_variables(data_five,columns_five)
+            return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd)
         return render_template('index.html',user_type=current_user.tipo)
+    
+@app.route('/create_model')
+@login_required
+def create_model():
+    return render_template('create_model.html',user_type=current_user.tipo)
+
+@app.route('/create_model_dataset', methods=['GET', 'POST'])
+@login_required
+def create_model_dataset():
+    if request.method=="GET":
+        columns,data = select_from_table_dataset_type("treino")
+        return render_template('create_model_dataset.html',user_type=current_user.tipo,data=data,columns=columns)
+
+@app.route('/create_model_dataset_param', methods=['GET', 'POST'])
+@login_required
+def create_model_dataset_param():
+    if request.method=="GET":
+        return render_template('create_model_dataset_param.html',user_type=current_user.tipo)
+    elif request.method=="POST":
+        if 'criterion' in request.form:
+            criterion = request.form.get('criterion')
+        if 'splitter' in request.form:
+            splitter = request.form.get('splitter')
+        if 'max_depth' in request.form:
+            max_depth = request.form.get('max_depth')
+        if 'min_samples_split' in request.form:
+            min_samples_split = request.form.get('min_samples_split')
+        if 'min_samples_leaf' in request.form:
+            min_samples_leaf = request.form.get('min_samples_leaf')
+        if 'min_weight_fraction_leaf' in request.form:
+            min_weight_fraction_leaf = request.form.get('min_weight_fraction_leaf')
+        if 'max_features' in request.form:
+            max_features = request.form.get('max_features')
+        if 'random_state' in request.form:
+            random_state = request.form.get('random_state')
+        if 'max_leaf_nodes' in request.form:
+            max_leaf_nodes = request.form.get('max_leaf_nodes')
+        if 'min_impurity_decrease' in request.form:
+            min_impurity_decrease = request.form.get('min_impurity_decrease')
+        if 'class_weight' in request.form:
+            class_weight = request.form.get('class_weight')
+        if 'ccp_alpha' in request.form:
+            ccp_alpha = request.form.get('ccp_alpha')
+        if 'monotonic_cst' in request.form:
+            monotonic_cst = request.form.get('monotonic_cst')
+        return render_template('create_model_dataset_param.html',user_type=current_user.tipo)
+        
 if __name__ == '__main__':
     app.run()

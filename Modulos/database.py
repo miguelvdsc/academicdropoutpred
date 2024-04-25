@@ -123,3 +123,12 @@ def select_from_table_id_one_dataset(table,id):
         columns = result.keys()
         data = result.fetchall()
         return data,columns
+    
+def select_from_table_dataset_type(type):
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"SELECT * FROM dataset WHERE tipo = '{type}'")
+        result = conn.execute(query)
+        columns = result.keys()
+        data = result.fetchall()
+        return columns, data
