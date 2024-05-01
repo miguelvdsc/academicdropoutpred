@@ -26,19 +26,7 @@
 {% extends 'sidebarbase.html' %}
 {% block body %}
     <section class="home">
-      <style>
-        .clickable-row:hover {
-            cursor: pointer;
-        }
-        .fixed-table {
-            table-layout: fixed;
-        }
-        .fixed-table th, .fixed-table td {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    </style>
+      
       
         <div class="container">
           <div class="row justify-content-center">
@@ -47,34 +35,62 @@
                 <div class="register-header text-center">
                   <h2>Criar Modelo</h2>
                 </div>
-                <label for="divi" class="form-label"><strong>Divisão para dados de teste</strong></label>
-                <input value="30" name="divi" id="divi" class="form-control" type="number" step="10"></input>
-                <table class="table table-hover table-responsive mt-5 fixed-table">
-                  <thead class="thead-dark">
+                <form action="{{ url_for('create_model_dataset_param') }}" method="POST">
+                  <label for="divi" class="form-label"><strong>Divisão para dados de teste</strong></label>
+                  <input value="30" name="divi" id="divi" class="form-control" type="number" step="10"></input>
+                  <input type="hidden" name="nomem" id="nomem" value="{{nome_modelo}}">
+                  <input type="hidden" name="selected_dataset" id="selected-dataset">
+                  <table class="table table-hover table-responsive mt-5 fixed-table">
+                    <thead class="thead-dark">
                       <tr>
-                          <th scope="col">ID</th>
-                          <th scope="col">Nome</th>
-                          <th scope="col">Tipo</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Tipo</th>
                       </tr>
-                  </thead>
-                  <tbody>
+                    </thead>
+                    <tbody>
                       {% for row in data %}
-                      <tr class="clickable-row" data-href="{{ url_for('show_dataset') }}" data-name="{{ row.name }}">
-                          <th scope="row">{{ row.id_dataset }}</th>
-                          <td>{{ row.name }}</td>
-                          <td>{{ row.tipo }}</td>
-                              <form action="{{ url_for('show_dataset') }}" method="POST" class="row-form">
-                                  <input type="hidden" name="id_dataset" value="{{ row.id_dataset }}">
-                              </form>
-                          </td>
+                      <tr class="dataset-row" onclick="selectDataset(this, {{ row.id_dataset }})">
+                        <th scope="row">{{ row.id_dataset }}</th>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.tipo }}</td>
                       </tr>
                       {% endfor %}
-                  </tbody>
-              </table>
+                    </tbody>
+                  </table>
+                  <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                </form>
               </div>
             </div>
           </div>
         </div>
+
+        <script>
+        function selectDataset(row, id_dataset) {
+          // Remove a classe 'selected' de todas as linhas
+          var rows = document.querySelectorAll('.dataset-row');
+          for (var i = 0; i < rows.length; i++) {
+            rows[i].classList.remove('selected');
+          }
+
+          // Adiciona a classe 'selected' apenas na linha clicada
+          row.classList.add('selected');
+
+          // Define o valor do campo de formulário oculto para o id_dataset da linha selecionada
+          document.getElementById('selected-dataset').value = id_dataset;
+        }
+        </script>
+
+        <style>
+        .dataset-row:hover {
+          cursor: pointer;
+          background-color: #ccc !important;
+        }
+
+        .dataset-row.selected {
+          background-color: #aaa !important;
+        }
+        </style>
           
     </section>
     

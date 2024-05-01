@@ -42,10 +42,7 @@
                   <h2>Parametros</h2>
                   <h4>Nome do Modelo</h4>
                 </div>
-                <form action="{{ url_for('model') }}" method="POST">
-                <input type="hidden" name="nomem" id="nomem" value="{{nome_modelo}}">
-                <input type="hidden" name="divi" id="divi" value="{{divi}}">
-                <input type="hidden" name="selected_dataset" id="selected-dataset" value="{{selected_dataset}}">
+                <form action="{{ url_for('create_model_dataset_param') }}" method="POST">
                 <div class="mb-3">
                 <label for="criterion" class="form-label"><strong>Criterion</strong></label>
                 <input value="gini" name="criterion" id="criterion" class="form-control" type="text">

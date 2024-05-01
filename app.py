@@ -1,10 +1,12 @@
+import json
 from flask import Flask, redirect, render_template, request, url_for
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_user_exists, check_pass, login_query, register_user, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, store_dataset
+from Modulos.database import change_password, check_if_user_exists, check_pass, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, store_dataset
 from Modulos.database import modify_estado
+from Modulos.model import train_model
 
 app = Flask(__name__)
 
@@ -153,11 +155,12 @@ def show_dataset():
         id_dataset = request.form['id_dataset']
         if id_dataset:
             data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
-            data_five,columns_five=select_head_dataset(id_dataset)
+            data_five,columns_five=query_showdata_head(id_dataset)
             lengc=len(columns_five)
             dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
             lengd=len(dd)
             transdf=translate_categorical_variables(data_five,columns_five)
+            print(columns_five)
             return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd)
         return render_template('index.html',user_type=current_user.tipo)
     
@@ -169,9 +172,11 @@ def create_model():
 @app.route('/create_model_dataset', methods=['GET', 'POST'])
 @login_required
 def create_model_dataset():
-    if request.method=="GET":
+    if request.method=="POST":
+        if 'nome' in request.form:
+            nome_modelo = request.form.get('nome')
         columns,data = select_from_table_dataset_type("treino")
-        return render_template('create_model_dataset.html',user_type=current_user.tipo,data=data,columns=columns)
+        return render_template('create_model_dataset.html',user_type=current_user.tipo,data=data,columns=columns,nome_modelo=nome_modelo)
 
 @app.route('/create_model_dataset_param', methods=['GET', 'POST'])
 @login_required
@@ -179,6 +184,28 @@ def create_model_dataset_param():
     if request.method=="GET":
         return render_template('create_model_dataset_param.html',user_type=current_user.tipo)
     elif request.method=="POST":
+        if 'nomem' in request.form:
+            nome_modelo = request.form.get('nomem')
+        if 'divi' in request.form:
+            divi = request.form.get('divi')
+        if 'selected_dataset' in request.form:
+            selected_dataset = request.form.get('selected_dataset') 
+           
+        print(nome_modelo,divi,selected_dataset)
+        return render_template('create_model_dataset_param.html',user_type=current_user.tipo,nome_modelo=nome_modelo,divi=divi,selected_dataset=selected_dataset)
+        
+@app.route('/model_info', methods=['GET', 'POST'])
+@login_required
+def model():
+    if request.method=="POST":
+        if 'nomem' in request.form:
+            nome_modelo = request.form.get('nomem')
+        if 'divi' in request.form:
+            divi = request.form.get('divi')
+        if 'selected_dataset' in request.form:
+            selected_dataset = request.form.get('selected_dataset') 
+        
+        
         if 'criterion' in request.form:
             criterion = request.form.get('criterion')
         if 'splitter' in request.form:
@@ -205,7 +232,35 @@ def create_model_dataset_param():
             ccp_alpha = request.form.get('ccp_alpha')
         if 'monotonic_cst' in request.form:
             monotonic_cst = request.form.get('monotonic_cst')
-        return render_template('create_model_dataset_param.html',user_type=current_user.tipo)
-        
+            
+        form_data = {
+            'criterion': str(criterion) if criterion in ['gini', 'entropy'] else 'gini',
+            'splitter': str(splitter) if splitter in ['best', 'random'] else 'best',
+            'max_depth': int(max_depth) if max_depth.isdigit() else None,
+            'min_samples_split': int(min_samples_split) if min_samples_split.isdigit() else 2,
+            'min_samples_leaf': int(min_samples_leaf) if min_samples_leaf.isdigit() else 1,
+            'min_weight_fraction_leaf': float(min_weight_fraction_leaf) if min_weight_fraction_leaf.replace('.', '', 1).isdigit() else 0.0,
+            'max_features': max_features if max_features in ['auto', 'sqrt', 'log2'] else None,
+            'random_state': int(random_state) if random_state.isdigit() else None,
+            'max_leaf_nodes': int(max_leaf_nodes) if max_leaf_nodes.isdigit() else None,
+            'min_impurity_decrease': float(min_impurity_decrease) if min_impurity_decrease.replace('.', '', 1).isdigit() else 0.0,
+            'class_weight': class_weight if class_weight in ['balanced', 'balanced_subsample'] else None,
+            'ccp_alpha': float(ccp_alpha) if ccp_alpha.replace('.', '', 1).isdigit() else 0.0,
+            'monotonic_cst': monotonic_cst if monotonic_cst else None,
+        }
+        df = query_to_dataframe('dataset_atributos', 'id_dataset', selected_dataset)
+        print(df)
+        split = float(divi) / 100.0
+        id_model=insert_into_model(nome_modelo,form_data)
+        if train_model(df,form_data,split,id_model):
+            print('Modelo treinado com sucesso')
+        return render_template('model_info.html',user_type=current_user.tipo)
+    elif request.method=="GET":
+        return render_template('model_info.html',user_type=current_user.tipo)
+
+    
+
+    
+    
 if __name__ == '__main__':
     app.run()

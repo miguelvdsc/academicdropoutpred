@@ -1,5 +1,18 @@
 to do:
-mudar função de selecionar o dataset pra aparecer so o do id e depois meter a mostrar os 5 primeiros
+
+vericicações na cena do type hidden
+meter mensagens de confirmação (deu certo ou nao)
+
+falta ver a cena de treinar dataset ta a dar 0.78
+passar o id do dataset pelo form e ver como passo pra dataframe qnd ler da base de dados
+
+mudar cor quando seleciona o dataset no modelo
+
+onehot encode pode dar barraco por causa do list nao ter feito à mao
 
 
-Perguntar se posso encortar o nome das colunas se for muito grande
+metricas roc auc,f1, recall,precision,acc
+
+mudar o a cena do admin do modelo autor
+
+mudar [10 rows x 67 columns] tem de ficar sempre 253
