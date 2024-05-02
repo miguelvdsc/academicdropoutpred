@@ -21,21 +21,21 @@
     <section class="home">
 
         
-        <div class="container my-5">
-            <h4 style="margin-left:20px">Dataset</h4>
+        <div class="container my-5 mb-4">
+            <h4 class="ml-md-20px">Dataset</h4>
             <br>
             <br>
             {% if data %}
     {% for row in data %}
-        <h6 style="margin-left:20px"><strong>Nome do Dataset:</strong> {{ row.name }}</h6>
-        <h6 style="margin-left:20px"><strong>Tipo:</strong> {{ row.tipo }}</h6>
+        <h6 class="ml-md-20px"><strong>Nome do Dataset:</strong> {{ row.name }}</h6>
+        <h6 class="ml-md-20px"><strong>Tipo:</strong> {{ row.tipo }}</h6>
         
     {% endfor %}
 {% else %}
     <h6>No columns found</h6>
 {% endif %}
-        <h6 style="margin-left:20px"><strong>Numero de colunas:</strong> {{ lengc }}</h6>
-        <h6 style="margin-left:20px"><strong>Numero de linhas:</strong> {{ lengd }}</h6>
+        <h6 class="ml-md-20px"><strong>Numero de colunas:</strong> {{ lengc }}</h6>
+        <h6 class="ml-md-20px"><strong>Numero de linhas:</strong> {{ lengd }}</h6>
 
             <style>
                 .fixed-width {

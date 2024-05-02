@@ -160,3 +160,20 @@ header .image-text .header-text{
     
 
   }
+
+  @media (min-width: 768px) {
+    .pr-md-32px {
+        padding-right: 32px !important;
+    }
+}
+@media (min-width: 768px) {
+    .ml-md-20px {
+        margin-left: 20px !important;
+    }
+    .ml-md-20px {
+        margin-left: 20px !important;
+    }
+    .mt-md-15px {
+        margin-top: 15px !important;
+    }
+}

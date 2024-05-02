@@ -1,10 +1,11 @@
+from curses import flash
 import json
 from flask import Flask, redirect, render_template, request, url_for
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_user_exists, check_pass, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, store_dataset
+from Modulos.database import change_password, check_if_user_exists, check_pass, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_model_info, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
 from Modulos.database import modify_estado
 from Modulos.model import train_model
 
@@ -194,7 +195,7 @@ def create_model_dataset_param():
         print(nome_modelo,divi,selected_dataset)
         return render_template('create_model_dataset_param.html',user_type=current_user.tipo,nome_modelo=nome_modelo,divi=divi,selected_dataset=selected_dataset)
         
-@app.route('/model_info', methods=['GET', 'POST'])
+@app.route('/model', methods=['GET', 'POST'])
 @login_required
 def model():
     if request.method=="POST":
@@ -204,7 +205,6 @@ def model():
             divi = request.form.get('divi')
         if 'selected_dataset' in request.form:
             selected_dataset = request.form.get('selected_dataset') 
-        
         
         if 'criterion' in request.form:
             criterion = request.form.get('criterion')
@@ -254,13 +254,21 @@ def model():
         id_model=insert_into_model(nome_modelo,form_data)
         if train_model(df,form_data,split,id_model):
             print('Modelo treinado com sucesso')
-        return render_template('model_info.html',user_type=current_user.tipo)
+            if not (set_active_model(id_model)):
+                flash('Erro ao ativar modelo', 'error')
+            else:
+                return render_template('model_info.html',user_type=current_user.tipo)
     elif request.method=="GET":
-        return render_template('model_info.html',user_type=current_user.tipo)
+         return render_template('create_model_dataset_param.html',user_type=current_user.tipo)
 
-    
-
-    
-    
+        
+@app.route('/model_info')
+@login_required
+def model_info():
+    data = retrieve_active_model_info()
+    parametros = data['parametros'].values[0]
+    print(parametros)
+    return render_template('model_info.html', user_type=current_user.tipo, data=parametros)
+            
 if __name__ == '__main__':
     app.run()

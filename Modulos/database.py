@@ -8,6 +8,16 @@ import bcrypt
 from sqlalchemy.exc import SQLAlchemyError
 
 def login_query(id):
+    """
+    Retrieves a user's name and type from a PostgreSQL database.
+
+    Parameters:
+    - id (int): The ID of the user to retrieve.
+
+    Returns:
+    - name (str): The name of the user.
+    - tipo (str): The type of the user.
+    """
     
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
@@ -20,6 +30,16 @@ def login_query(id):
     
     
 def check_if_user_exists(username,password):
+    """
+    Retrieves a user's ID from a PostgreSQL database.
+
+    Parameters:
+    - username (str): The username of the user to retrieve.
+
+    Returns:
+    - id (int): The ID of the user if the user exists.
+    - False (bool): False if the user does not exist.
+    """
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
         query = sql.text(f"SELECT id FROM users WHERE name = '{username}'")
@@ -31,6 +51,20 @@ def check_if_user_exists(username,password):
             return data[0][0]
         
 def register_user(name, email, password, cargo):
+    """
+    Registers a new user in a PostgreSQL database.
+
+    Parameters:
+    - name (str): The name of the user.
+    - email (str): The email of the user.
+    - password (str): The password of the user.
+    - cargo (str): The role of the user.
+
+    Returns:
+    - True (bool): True if the user was successfully registered.
+    - False (bool): False if an error occurred.
+
+    """
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
@@ -45,6 +79,17 @@ def register_user(name, email, password, cargo):
             return False
     
 def change_password(id, password):
+    """
+    Updates a user's password in a PostgreSQL database.
+
+    Parameters:
+    - id (int): The ID of the user.
+    - password (str): The new password of the user.
+
+    Returns:
+    - True (bool): True if the password was successfully updated.
+    - False (bool): False if an error occurred.
+    """
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
@@ -345,10 +390,6 @@ def query_showdata_head(id):
     # Create a connection to the PostgreSQL database
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
 
-    # Define your SQL query
-   
-
-
     # Get a Connection object from the Engine
     with engine.connect() as connection:
         query = sql.text(f"""
@@ -362,3 +403,152 @@ def query_showdata_head(id):
         return data,columns
 
     
+def deactivate_all_models():
+    """
+    Deactivate all models in the 'models' table in a PostgreSQL database.
+
+    Parameters:
+    - database_name (str): The name of the PostgreSQL database.
+
+    Returns:
+    - success (bool): True if the models were deactivated successfully, False otherwise.
+    """
+    try:
+        engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+        # Store the user in the database
+        with engine.connect() as connection:
+
+            # Update the value in the table
+            query = sql.text(f"""
+                        UPDATE modelo SET 
+                        is_active = FALSE
+                        """)
+            
+            connection.execute(query)
+            connection.commit()
+            return True 
+
+    except SQLAlchemyError as e:
+        print(f"An error occurred while deactivating all models.")
+        print(str(e))
+        return False
+
+    
+
+def set_active_model(id_modelo):
+    """
+    Set the active model in the 'models' table in a PostgreSQL database.
+
+    Parameters:
+    - id_modelo (int): The ID of the active model.
+
+    Returns:
+    - success (bool): True if the active model was set successfully, False otherwise.
+    """
+
+    if deactivate_all_models():
+
+        try:
+            engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+            with engine.connect() as connection:
+
+                # Update the value in the table
+                query = sql.text(f"""
+                            UPDATE modelo SET 
+                            is_active = TRUE
+                            WHERE id_modelo = :id_modelo
+                            """)
+                
+                params = {'id_modelo': id_modelo}
+    
+                connection.execute(query, params)
+                connection.commit()
+
+                return True 
+
+        except SQLAlchemyError as e:
+            print(f"An error occurred while setting the active model.")
+            print(str(e))
+            return False 
+    else:
+        return False
+    
+    
+    
+def retrieve_model(id_modelo):
+    """
+    retrieves a model from a PostgreSQL database and saved file.
+
+    Parameters:
+    - id_modelo (int): The ID of the model to retrieve.
+
+    Returns:
+    - model (object): The model to retrieve.
+
+    Raises:
+    - SQLAlchemyError: If an error occurs while retrieving the dataset.
+    """
+    try:
+        # Create a connection to PostgreSQL database
+        engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+        # Define the SQL query to select rows from the model table
+        query = sql.text("""
+        SELECT *
+        FROM modelo
+        WHERE id_modelo = :id_modelo
+        """)
+
+        params={"id_modelo": id_modelo}
+
+        # retrieve the dataframe with the model info
+        model_info = pd.read_sql(query, engine, params=params)
+
+        # Check if the model_id exists in the table
+        if not model_info.empty:
+            # Get the model file name from the dataframe
+            filename = model_info['filename'].values[0]
+        else:
+            print(f"Model with id {id_modelo} not found.")
+            filename = None
+
+        # Combine the folder path and the model file name
+        directory="static/downloads"
+        model_file_path = os.path.join(directory, filename)
+
+
+        model = joblib.load(model_file_path)
+
+        return model
+    
+    except SQLAlchemyError as e:
+        print(f"An error occurred while retrieving the model {id_modelo} from model.")
+        print(str(e))
+        
+        
+def retrieve_active_model_info():
+    """
+    Retrieves the information about the active model from the 'model' table in the PostgreSQL database.
+
+    Parameters:
+    None
+
+    Returns:
+    - model_info (pd.DataFrame): A DataFrame that includes the rows where the 'is_active' column is True.
+    """
+
+    # Create a connection to the PostgreSQL database
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+    # Connect to the database
+    with engine.connect() as conn:
+        # Define the SQL query
+        query = sql.text("SELECT * FROM modelo WHERE is_active = TRUE")
+
+        # Execute the query and convert the result to a DataFrame
+        model_info = pd.read_sql_query(query, engine)
+
+    # Return the DataFrame
+    return model_info

@@ -9,71 +9,73 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css">
     
     <title>Document</title>
-    <style>
-        div.dt-container {
-            width: 800px;
-            margin: 0 auto;
-        }
-    </style>
 </head>
 {% extends 'sidebarbase.html' %}
 {% block body %}
     <section class="home">
 
         
-        <div class="container my-5">
-            <h4 style="margin-left:20px">Informação do modelo</h4>
-            <br>
-            <br>
-            {% if data %}
-    {% for row in data %}
-    <h6 style="margin-left:20px"><strong>Nome do modelo:</strong> {{ row.tipo }}</h6>
-        <h6 style="margin-left:20px"><strong>Nome do Dataset:</strong> {{ row.name }}</h6>
-
-        
-    {% endfor %}
-{% endif %}
-
-            <style>
-                .fixed-width {
-                    min-width: 200px; /* Adjust as needed */
-                }
-            </style>
-
-            <!-- First three rows -->
-            {% for _ in range(3) %}
-                <div class="row mb-3">
-                    {% for _ in range(4) %}
-                    <div class="col-sm-3">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">coiso</h5>
-                                <p class="card-text">1.0</p>
-                            </div>
+        <div class="container my-5 mb-4">
+            <h4 class="ml-md-20px">Modelo: </h4>
+            <div class="ml-md-20px mt-md-15px">
+                <a href="{{ url_for('dados_upload_file') }}" class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px;" type="button">Dataset de Treino</a>
+                <a href="{{ url_for('dados_select_dataset') }}" class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px;" type="button">Avaliação</a>
+            </div>
+        </div>
+            <div class="container ml-md-20px">
+                <div class="row">
+                    <h6><strong>Paramêtros do Modelo:</strong></h6>
+                    <!-- First main column -->
+                    <div class="col-sm-6">
+                        <!-- Two sub-columns with cards -->
+                        <div class="row">
+                            {% for key, value in data.items() %}
+                                <div class="col-sm-6 d-flex align-items-stretch">
+                                    <div class="card mb-2" style="width: 100%;">
+                                        <div class="card-body">
+                                            <h5 class="card-title" style="font-size: 1.1em;"><strong style="font-weight: 550;">{{ key }}</strong></h5>
+                                            <p class="card-text" style="font-size: 0.9em;">{{ value }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if loop.index is divisibleby 2 %}
+                                    </div><div class="row">
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
 
-            <!-- Fourth row -->
-            <div class="row justify-content-center">
-                <div class="col-sm-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">coiso</h5>
-                            <p class="card-text">1.0</p>
+                    <!-- Second main column -->
+                    <div class="col-sm-6">
+                        <div class="pr-3 pr-md-32px">
+                            <img src="/static/graphs/sphx_glr_plot_confusion_matrix_002.png" alt="Confusion Matrix" class="img-fluid">
                         </div>
                     </div>
                 </div>
             </div>
-                
-             </div>
     </section>
     
     
 
 </body>
+<style>
+@media (min-width: 768px) {
+    .pr-md-32px {
+        padding-right: 32px !important;
+    }
+}
+@media (min-width: 768px) {
+    .ml-md-20px {
+        margin-left: 20px !important;
+    }
+    .ml-md-20px {
+        margin-left: 20px !important;
+    }
+    .mt-md-15px {
+        margin-top: 15px !important;
+    }
+}
+</style>
 </html>
 
 <script src="https://cdn.datatables.net/2.0.5/js/dataTables.dataTables.min.js"></script>

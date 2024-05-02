@@ -16,3 +16,8 @@ metricas roc auc,f1, recall,precision,acc
 mudar o a cena do admin do modelo autor
 
 mudar [10 rows x 67 columns] tem de ficar sempre 253
+
+
+mudar todas as paginas
+
+class="ml-md-20px"
