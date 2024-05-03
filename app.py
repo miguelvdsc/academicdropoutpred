@@ -257,7 +257,12 @@ def model():
             if not (set_active_model(id_model)):
                 flash('Erro ao ativar modelo', 'error')
             else:
-                return render_template('model_info.html',user_type=current_user.tipo)
+                data = retrieve_active_model_info()
+                parametros = data['parametros'].values[0]
+                nome=data['nome'].values[0]
+                id=data['id_modelo'].values[0]
+                return render_template('model_info.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id)
+            
     elif request.method=="GET":
          return render_template('create_model_dataset_param.html',user_type=current_user.tipo)
 
@@ -267,8 +272,16 @@ def model():
 def model_info():
     data = retrieve_active_model_info()
     parametros = data['parametros'].values[0]
-    print(parametros)
-    return render_template('model_info.html', user_type=current_user.tipo, data=parametros)
+    nome=data['nome'].values[0]
+    id=data['id_modelo'].values[0]
+    return render_template('model_info.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id)
+            
+            
+@app.route('/select_model')
+@login_required
+def select_model():
+    columns, data = select_from_table('modelo')
+    return render_template('select_model.html',user_type=current_user.tipo,columns=columns,data=data)        
             
 if __name__ == '__main__':
     app.run()

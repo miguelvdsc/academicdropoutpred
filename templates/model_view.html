@@ -29,7 +29,7 @@
                     <div class="col-sm-6">
                         <!-- Two sub-columns with cards -->
                         <div class="row">
-                            {% for key, value in parametros.items() %}
+                            {% for key, value in data.items() %}
                                 <div class="col-sm-6 d-flex align-items-stretch px-1">
                                     <div class="card mb-2" style="width: 100%;">
                                         <div class="card-body">
@@ -48,7 +48,7 @@
                     <!-- Second main column -->
                     <div class="col-sm-6">
                         <div class="pr-3 pr-md-32px">
-                            <img src="/static/graphs/model_{{ id }}_confusion_matrix.svg" alt="Confusion Matrix" class="img-fluid">
+                            <img src="/static/graphs/sphx_glr_plot_confusion_matrix_002.png" alt="Confusion Matrix" class="img-fluid">
                         </div>
                     </div>
                 </div>

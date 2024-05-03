@@ -552,3 +552,25 @@ def retrieve_active_model_info():
 
     # Return the DataFrame
     return model_info
+
+def get_evaluation(model_id):
+    """
+    Retrieves the evaluation results from the 'evaluation' table in the PostgreSQL database.
+
+    Parameters:
+    - model_id (int): The ID of the model.
+
+    Returns:
+    - evaluations (pd.DataFrame): A DataFrame that includes the rows where the 'id_model' column equals the provided model_id.
+    """
+    # Create a connection to the PostgreSQL database
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+    # Define your SQL query
+    query = sql.text(f"SELECT * FROM avaliacao WHERE id_modelo = :model_id")
+
+    # Execute the query and convert the result to a DataFrame
+    evaluations = pd.read_sql_query(query, engine, params={"model_id": model_id})
+
+    return evaluations
+    

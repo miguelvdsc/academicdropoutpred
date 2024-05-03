@@ -5,7 +5,8 @@ from sklearn.metrics import confusion_matrix
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 
-from Modulos.database import save_model, store_evaluation, update_model_file
+from Modulos.database import get_evaluation, save_model, store_evaluation, update_model_file
+from Modulos.frontend import plot_confusion_matrix
 
 
 def train_model(dataset,params,split,id_model):
@@ -71,6 +72,11 @@ def train_model(dataset,params,split,id_model):
     
     # Return the trained model
     
+    
+    #visualization
+    
+    plot_confusion_matrix(id_model)
+    
     return dt
     
     
@@ -90,3 +96,51 @@ def translate_categorical_variabless(data,columns):
                 new_d.append(d[i])
         new_data.append(new_d)
     return new_data
+
+
+
+
+
+
+from sklearn import metrics
+
+def create_full_evaluation(model_id):
+    try:
+        eval = get_evaluation(model_id)
+        
+        tn = eval['tn'].values[0]
+        fp = eval['fp'].values[0]
+        fn = eval['fn'].values[0]
+        tp = eval['tp'].values[0]
+
+        # Calculate rates
+        tpr = tp / (tp + fn)
+        fpr = fp / (fp + tn)
+
+        # Calculate total observations
+        total = tp + tn + fp + fn
+
+        # Calculate metrics
+        roc_auc = metrics.auc(fpr, tpr)
+        f1 = metrics.f1_score(tp, fp)
+        recall = metrics.recall_score(tp, fn)
+        precision = metrics.precision_score(tp, fp)
+        accuracy = (tp + tn) / total
+
+        # Return metrics, tp, tn, fp, fn, tpr, and fpr as a dictionary
+        return {
+            "ROC AUC": roc_auc,
+            "F1": f1,
+            "Recall": recall,
+            "Precision": precision,
+            "Accuracy": accuracy,
+            "tp": tp,
+            "tn": tn,
+            "fp": fp,
+            "fn": fn,
+            "tpr": tpr,
+            "fpr": fpr
+        }
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {}
