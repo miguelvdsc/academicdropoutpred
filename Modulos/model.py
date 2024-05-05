@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
 from sklearn import tree
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 
-from Modulos.database import get_evaluation, save_model, store_evaluation, update_model_file
-from Modulos.frontend import plot_confusion_matrix
+from Modulos.database import get_evaluation, retrieve_active_model_info, retrieve_model, save_model, store_evaluation, update_model_file
+from Modulos.frontend import plot_confusion_matrix, plot_precision_recall_curve, roc_curve
 
 
 def train_model(dataset,params,split,id_model):
@@ -62,20 +62,52 @@ def train_model(dataset,params,split,id_model):
     
     #avaliação
     
+    
+    
     # Predict the labels for the test set
     gtPred = dt.predict(featuresTest)
 
     # Create the confusion matrix
     cm = confusion_matrix(gtTest, gtPred)
     
-    store_evaluation(id_model,cm)
+    
+    
+    
     
     # Return the trained model
+    tn, fp, fn, tp = cm.ravel()
+    tn = tn.item() if isinstance(tn, np.int64) else tn
+    fp = fp.item() if isinstance(fp, np.int64) else fp
+    fn = fn.item() if isinstance(fn, np.int64) else fn
+    tp = tp.item() if isinstance(tp, np.int64) else tp
+
+    # Calculate F1 score
+    f1 = f1_score(gtTest, gtPred, pos_label='Dropout')
+
+    # Calculate ROC AUC
+    roc_auc = (tp / (tp + fn) + tn / (tn + fp)) / 2
+
+    # Calculate recall
+    recall = recall_score(gtTest, gtPred, pos_label='Dropout')
+
+    # Calculate precision
+    precision = precision_score(gtTest, gtPred, pos_label='Dropout')
+
+    # Calculate accuracy
+    accuracy = (tp + tn) / (tp + tn + fp + fn)
+
+    print(f1,roc_auc,recall,precision,accuracy)
     
+    store_evaluation(id_model,accuracy,precision,recall,roc_auc,f1,tn,fp,fn,tp)
     
     #visualization
     
+    # y_score = dt.predict_proba(featuresTest)[:, 1]
     plot_confusion_matrix(id_model)
+    # plot_precision_recall_curve(gtTest,y_score,id_model)
+    # roc_curve(gtTest,y_score,id_model)
+    
+    
     
     return dt
     
@@ -113,19 +145,20 @@ def create_full_evaluation(model_id):
         fn = eval['fn'].values[0]
         tp = eval['tp'].values[0]
 
-        # Calculate rates
-        tpr = tp / (tp + fn)
-        fpr = fp / (fp + tn)
+        # Calculate F1 score
+        f1 = tp / (tp + 0.5 * (fp + fn))
 
-        # Calculate total observations
-        total = tp + tn + fp + fn
+        # Calculate ROC AUC
+        roc_auc = (tp / (tp + fn) + tn / (tn + fp)) / 2
 
-        # Calculate metrics
-        roc_auc = metrics.auc(fpr, tpr)
-        f1 = metrics.f1_score(tp, fp)
-        recall = metrics.recall_score(tp, fn)
-        precision = metrics.precision_score(tp, fp)
-        accuracy = (tp + tn) / total
+        # Calculate recall
+        recall = tp / (tp + fn)
+
+        # Calculate precision
+        precision = tp / (tp + fp)
+
+        # Calculate accuracy
+        accuracy = (tp + tn) / (tp + tn + fp + fn)
 
         # Return metrics, tp, tn, fp, fn, tpr, and fpr as a dictionary
         return {
@@ -138,9 +171,12 @@ def create_full_evaluation(model_id):
             "tn": tn,
             "fp": fp,
             "fn": fn,
-            "tpr": tpr,
-            "fpr": fpr
         }
     except Exception as e:
         print(f"An error occurred: {e}")
         return {}
+    
+def predict(df,dfname):
+    model_id = int(retrieve_active_model_info()['id_modelo'][0])
+    model = retrieve_model(model_id)
+    

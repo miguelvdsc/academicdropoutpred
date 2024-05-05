@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import joblib
+import numpy as np
 import pandas as pd
 import sqlalchemy as sql
 import bcrypt
@@ -103,7 +104,17 @@ def change_password(id, password):
             print(f"An error occurred: {e}")
             return False
 
-def check_pass(id,password):
+def check_pass(id, password):
+    """
+    Check if the provided password matches the password stored in the database for the given user ID.
+
+    Args:
+        id (int): The user ID.
+        password (str): The password to check.
+
+    Returns:
+        bool: True if the password matches, False otherwise.
+    """
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
         query = sql.text(f"SELECT password FROM users WHERE id = {id}")
@@ -116,6 +127,15 @@ def check_pass(id,password):
     
     
 def modify_estado(id):
+    """
+    Modifies the estado (state) of a user in the database.
+
+    Args:
+        id (int): The ID of the user to modify.
+
+    Returns:
+        None
+    """
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
         query = sql.text("UPDATE users SET estado = 0 WHERE id = :id")
@@ -125,6 +145,17 @@ def modify_estado(id):
         
         
 def select_from_table(table):
+    """
+    Retrieve all rows from the specified table in the database.
+
+    Args:
+        table (str): The name of the table to select from.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - columns (list): A list of column names in the selected table.
+            - data (list): A list of tuples representing the rows of data from the selected table.
+    """
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
         query = sql.text(f"SELECT * FROM {table}")
@@ -184,7 +215,7 @@ def select_from_table_dataset_type(type):
         return columns, data
     
     
-def insert_into_model(nome,parametros):
+def insert_into_model(nome,parametros,id_dataset):
     """
     Inserts a new row into the 'model' table in the PostgreSQL database.
 
@@ -202,10 +233,10 @@ def insert_into_model(nome,parametros):
     # Connect to the database
     with engine.connect() as conn:
         # Define the SQL query
-        query = sql.text("INSERT INTO modelo (nome, parametros, autor,filename) VALUES (:nome, :parametros, :autor, :filename) RETURNING id_modelo")
+        query = sql.text("INSERT INTO modelo (nome, parametros, autor,filename,id_dataset) VALUES (:nome, :parametros, :autor, :filename, :id_dataset) RETURNING id_modelo")
 
         # Define the parameters
-        params = {'nome': nome, 'parametros': json.dumps(parametros), 'autor': autor, 'filename': None}
+        params = {'nome': nome, 'parametros': json.dumps(parametros), 'autor': autor, 'filename': None, 'id_dataset': id_dataset}
 
         # Execute the query and fetch the returned id
         result = conn.execute(query, params)
@@ -339,51 +370,51 @@ def retrieve_model_info(table, id_modelo):
     # Return the data
     return data
     
-def store_evaluation(model_id,matrix):
-    """
-    Stores the evaluation results in the 'evaluation' table in the PostgreSQL database.
+# def store_evaluation_ant(id_model,accuracy,precision,recall,roc_auc,f1,tn,fp,fn,tp):
+#     """
+#     Stores the evaluation results in the 'evaluation' table in the PostgreSQL database.
 
-    Parameters:
-    model_id (int): The ID of the model.
-    matrix (list): The confusion matrix to be stored.
+#     Parameters:
+#     model_id (int): The ID of the model.
+#     matrix (list): The confusion matrix to be stored.
 
-    Returns:
-    - success (bool): True if the evaluations were stored successfully, False otherwise.
-    """
-    flat_matrix = matrix.ravel()
-    print(flat_matrix)
-    # Check the size of the flattened matrix
-    if len(flat_matrix) != 4:
-        print(f"Expected a 2x2 confusion matrix, but got a matrix with {len(flat_matrix)} elements.")
-        return False
+#     Returns:
+#     - success (bool): True if the evaluations were stored successfully, False otherwise.
+#     """
+#     # flat_matrix = matrix.ravel()
+#     # print(flat_matrix)
+#     # # Check the size of the flattened matrix
+#     # if len(flat_matrix) != 4:
+#     #     print(f"Expected a 2x2 confusion matrix, but got a matrix with {len(flat_matrix)} elements.")
+#     #     return False
 
-    fp, fn, tp, tn = matrix.ravel()
+#     # fp, fn, tp, tn = matrix.ravel()
     
-    # Convert numpy.int64 types to int
-    fp, fn, tp, tn = int(fp), int(fn), int(tp), int(tn)
+#     # # Convert numpy.int64 types to int
+#     # fp, fn, tp, tn = int(fp), int(fn), int(tp), int(tn)
     
-    try:
-        # Create a connection to the PostgreSQL database
-        engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+#     try:
+#         # Create a connection to the PostgreSQL database
+#         engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
 
-        # Connect to the database
-        with engine.connect() as conn:
-            # Define the SQL query
-            query = sql.text("INSERT INTO avaliacao (tp,tn,fp,fn,id_modelo) VALUES (:tp,:tn,:fp,:fn,:id_modelo)")
+#         # Connect to the database
+#         with engine.connect() as conn:
+#             # Define the SQL query
+#             query = sql.text("INSERT INTO avaliacao (tp,tn,fp,fn,id_modelo) VALUES (:tp,:tn,:fp,:fn,:id_modelo)")
 
-            # Define the parameters
-            params = {'tp': tp, 'tn': tn, 'fp': fp, 'fn': fn, 'id_modelo': model_id}
+#             # Define the parameters
+#             params = {'tp': tp, 'tn': tn, 'fp': fp, 'fn': fn, 'id_modelo': id_model}
 
-            # Execute the query
-            conn.execute(query, params)
+#             # Execute the query
+#             conn.execute(query, params)
             
-            conn.commit()
-            return True
+#             conn.commit()
+#             return True
             
-    except SQLAlchemyError as e:
-        print(f"An error occurred while storing the model {model_id}.")
-        print(str(e))
-        return False
+#     except SQLAlchemyError as e:
+#         print(f"An error occurred while storing the model {model_id}.")
+#         print(str(e))
+#         return False
     
 def query_showdata_head(id):
 
@@ -553,12 +584,12 @@ def retrieve_active_model_info():
     # Return the DataFrame
     return model_info
 
-def get_evaluation(model_id):
+def get_evaluation(id_modelo):
     """
     Retrieves the evaluation results from the 'evaluation' table in the PostgreSQL database.
 
     Parameters:
-    - model_id (int): The ID of the model.
+    - id_modelo (int): The ID of the model.
 
     Returns:
     - evaluations (pd.DataFrame): A DataFrame that includes the rows where the 'id_model' column equals the provided model_id.
@@ -567,10 +598,125 @@ def get_evaluation(model_id):
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
 
     # Define your SQL query
-    query = sql.text(f"SELECT * FROM avaliacao WHERE id_modelo = :model_id")
-
+    query = sql.text("SELECT tn, fp, fn, tp, f1_score, roc_auc, recall, precision, accuracy FROM avaliacao WHERE id_modelo = :id_modelo")
     # Execute the query and convert the result to a DataFrame
-    evaluations = pd.read_sql_query(query, engine, params={"model_id": model_id})
+    evaluations = pd.read_sql_query(query, engine, params={"id_modelo": int(id_modelo)})
 
     return evaluations
     
+    
+def retrieve_model_info_dataf(table,id_modelo):
+    """
+    Retrieves information about a specific model from a database table.
+
+    Parameters:
+    table (str): The name of the table in the database.
+    id_modelo (int): The ID of the model.
+
+    Returns:
+    list: A list of tuples where each tuple represents a row in the result set.
+    """
+
+    # Create a connection to the PostgreSQL database
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+    # Connect to the database
+    with engine.connect() as conn:
+        # Define the SQL query
+        query = sql.text(f"SELECT * FROM {table} WHERE id_modelo = {id_modelo}")
+
+        df = pd.read_sql_query(query, engine, params={"id_modelo": id_modelo})
+
+    # Return the data
+    # Convert the result to a DataFrame
+    # Return the DataFrame
+    return df
+
+def export_dataset(id_dataset,tipo):
+    """
+    Exports a dataset from the 'dataset_atributos' table in the PostgreSQL database to a CSV file.
+
+    Parameters:
+    - id_dataset (int): The ID of the dataset to export.
+
+    Returns:
+    - success (bool): True if the dataset was exported successfully, False otherwise.
+    """
+    try:
+        # Create a connection to the PostgreSQL database
+        engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+        # Connect to the database
+        with engine.connect() as conn:
+            # Define the SQL query
+            if(tipo=="2"):
+                query = sql.text(f"""
+                SELECT "Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification", "Curricular units 1st sem (approved)", "Curricular units 2nd sem (approved)"
+                FROM dataset_atributos
+                WHERE id_dataset = :id_dataset
+                """)
+            else:
+                query = sql.text(f"""
+                SELECT "Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Target", "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification", "Curricular units 1st sem (approved)", "Curricular units 2nd sem (approved)"
+                FROM dataset_atributos
+                WHERE id_dataset = :id_dataset
+                """)
+            # Execute the query and convert the result to a DataFrame
+            df = pd.read_sql_query(query, engine, params={"id_dataset": id_dataset})
+
+            # Define the filename
+            filename = f"dataset.csv"
+
+            # Define the filepath
+            filepath = os.path.join("static/downloads_data", filename)
+
+            # Export the DataFrame to a CSV file
+            df.to_csv(filepath, index=False)
+
+            return True
+
+    except SQLAlchemyError as e:
+        print(f"An error occurred while exporting the dataset {id_dataset}.")
+        print(str(e))
+        return False
+    
+    
+def retrieve_dataset_info_type(tipo):
+    """
+    Retrieves information about the datasets from the 'dataset' table in the PostgreSQL database.
+
+    Parameters:
+    - tipo (str): The type of dataset to retrieve information for.
+
+    Returns:
+    - columns (list): A list of column names from the 'dataset' table.
+    - data (list): A list of rows from the 'dataset' table.
+    """
+    # Create a connection to the PostgreSQL database
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+
+    # Define your SQL query
+    query = sql.text(f"SELECT * FROM dataset WHERE tipo = '{tipo}'")
+
+    result = engine.execute(query)
+    columns = result.keys()
+    data = result.fetchall()
+    return columns, data
+    
+    
+def store_evaluation(id_model,accuracy,precision,recall,roc_auc,f1_score,tn,fp,fn,tp):
+    
+    
+    
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    
+    with engine.connect() as conn:
+        try:
+            query = sql.text("INSERT INTO avaliacao (id_modelo, accuracy, precision, recall, roc_auc, f1_score, tn, fp, fn, tp) VALUES (:id_model, :accuracy, :precision, :recall, :roc_auc, :f1_score, :tn, :fp, :fn, :tp)")
+            params = {'id_model': id_model, 'accuracy': accuracy, 'precision': precision, 'recall': recall, 'roc_auc': roc_auc, 'f1_score': f1_score, 'tn': tn, 'fp': fp, 'fn': fn, 'tp': tp}
+            result = conn.execute(query, params)
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return False

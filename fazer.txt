@@ -18,6 +18,32 @@ mudar o a cena do admin do modelo autor
 mudar [10 rows x 67 columns] tem de ficar sempre 253
 
 
-mudar todas as paginas
 
-class="ml-md-20px"
+
+
+meter certas paginas para ver so o docente
+
+
+ver avaliação nao ta com boa cara
+
+
+fazer butao de descarregar descarregar
+
+fazer butao de ativar modelo
+
+
+mudar a cena do document la em cima
+
+
+verificacao de ficheiro tipo csv e isso
+
+
+no select do dataset qnd for pra prever tirar o target, e mudar o tipo para oq corresponde
+
+Mudar export para os tipos de dataset
+
+
+perguntar sobre o grafico
+
+
+dataset e previsao tem de ser para cada utilizador diferente

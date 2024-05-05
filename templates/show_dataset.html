@@ -23,10 +23,16 @@
         
         <div class="container my-5 mb-4">
             <h4 class="ml-md-20px">Dataset</h4>
-            <br>
-            <br>
-            {% if data %}
+            <div class="ml-md-20px mt-md-15px">
+                {% if data %}
     {% for row in data %}
+                <form method="post" action="{{ url_for('export_ds') }}">
+                    <input type="hidden" name="id_dataset" value="{{row.id_dataset}}">
+                    <input type="hidden" name="tipo" value="{{row.tipo}}">
+                    <button class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px;" type="submit">Descarregar Dataset</button>
+                </form>
+                        </div>
+            
         <h6 class="ml-md-20px"><strong>Nome do Dataset:</strong> {{ row.name }}</h6>
         <h6 class="ml-md-20px"><strong>Tipo:</strong> {{ row.tipo }}</h6>
         

@@ -1,13 +1,13 @@
 from curses import flash
 import json
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_user_exists, check_pass, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_model_info, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
+from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
 from Modulos.database import modify_estado
-from Modulos.model import train_model
+from Modulos.model import create_full_evaluation, train_model
 
 app = Flask(__name__)
 
@@ -251,7 +251,7 @@ def model():
         df = query_to_dataframe('dataset_atributos', 'id_dataset', selected_dataset)
         print(df)
         split = float(divi) / 100.0
-        id_model=insert_into_model(nome_modelo,form_data)
+        id_model=insert_into_model(nome_modelo,form_data,selected_dataset)
         if train_model(df,form_data,split,id_model):
             print('Modelo treinado com sucesso')
             if not (set_active_model(id_model)):
@@ -261,7 +261,9 @@ def model():
                 parametros = data['parametros'].values[0]
                 nome=data['nome'].values[0]
                 id=data['id_modelo'].values[0]
-                return render_template('model_info.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id)
+                id_dataset=data['id_dataset'].values[0]
+                eval=get_evaluation(id)
+                return render_template('model_info.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id,eval=eval,id_dataset=id_dataset)
             
     elif request.method=="GET":
          return render_template('create_model_dataset_param.html',user_type=current_user.tipo)
@@ -274,8 +276,11 @@ def model_info():
     parametros = data['parametros'].values[0]
     nome=data['nome'].values[0]
     id=data['id_modelo'].values[0]
-    return render_template('model_info.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id)
+    id_dataset=data['id_dataset'].values[0]
+    eval=get_evaluation(id)
+    return render_template('model_info.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id,eval=eval,id_dataset=id_dataset)
             
+       
             
 @app.route('/select_model')
 @login_required
@@ -283,5 +288,32 @@ def select_model():
     columns, data = select_from_table('modelo')
     return render_template('select_model.html',user_type=current_user.tipo,columns=columns,data=data)        
             
+@app.route('/model_hist_view',methods=['GET', 'POST'])
+@login_required
+def model_hist_view():
+    if request.method=="POST" and 'id_modelo' in request.form:
+        id_modelo = request.form['id_modelo']
+        data = retrieve_model_info_dataf('modelo',id_modelo)
+        parametros = data['parametros'].values[0]
+        nome=data['nome'].values[0]
+        id=data['id_modelo'].values[0]
+        id_dataset=data['id_dataset'].values[0]
+        eval=get_evaluation(id)
+        return render_template('model_hist_view.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id,eval=eval,id_dataset=id_dataset)
+            
+
+@app.route('/export_ds',methods=[ 'POST'])
+@login_required
+def export_ds():
+    if request.method=='POST' and 'id_dataset' in request.form and 'tipo' in request.form:
+        id_dataset = request.form['id_dataset']
+        tipo=request.form['tipo']
+        print(id_dataset)
+        if export_dataset(id_dataset,tipo):
+            nome=query_to_dataframe('dataset','id_dataset',id_dataset)['name'].values[0]
+            print(nome)
+            return send_file('static/downloads_data/dataset.csv', as_attachment=True, download_name=f'{nome}.csv')
+        return 'An error occurred'
+    
 if __name__ == '__main__':
     app.run()
