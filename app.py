@@ -315,5 +315,14 @@ def export_ds():
             return send_file('static/downloads_data/dataset.csv', as_attachment=True, download_name=f'{nome}.csv')
         return 'An error occurred'
     
+@app.route('/activate_model',methods=[ 'POST'])
+@login_required
+def activate_model():
+    if request.method=='POST' and 'id_modelo' in request.form:
+        id_modelo = request.form['id_modelo']
+        if set_active_model(id_modelo):
+            return redirect(url_for('model_info'))
+        return 'An error occurred'
+    
 if __name__ == '__main__':
     app.run()

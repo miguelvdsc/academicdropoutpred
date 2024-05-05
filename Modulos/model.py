@@ -104,7 +104,7 @@ def train_model(dataset,params,split,id_model):
     
     # y_score = dt.predict_proba(featuresTest)[:, 1]
     plot_confusion_matrix(id_model)
-    # plot_precision_recall_curve(gtTest,y_score,id_model)
+    # plot_precision_recall_curve(gtTest,gtPred,id_model)
     # roc_curve(gtTest,y_score,id_model)
     
     

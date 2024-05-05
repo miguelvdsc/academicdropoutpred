@@ -97,6 +97,7 @@ def plot_precision_recall_curve(y_test,y_score,id_modelo):
     Returns:
     None
     """
+    
     try:
         # Plot the precision-recall curve
         plt.figure()
