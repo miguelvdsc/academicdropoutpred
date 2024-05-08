@@ -1,12 +1,14 @@
+import json
 import numpy as np
 import pandas as pd
 from sklearn import tree
-from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
+from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score, roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 
 from Modulos.database import get_evaluation, retrieve_active_model_info, retrieve_model, save_model, store_evaluation, update_model_file
-from Modulos.frontend import plot_confusion_matrix, plot_precision_recall_curve, roc_curve
+from Modulos.frontend import plot_confusion_matrix, plot_precision_recall_curve, plot_roc_curve
+from sklearn.preprocessing import OneHotEncoder
 
 
 def train_model(dataset,params,split,id_model):
@@ -66,12 +68,13 @@ def train_model(dataset,params,split,id_model):
     
     # Predict the labels for the test set
     gtPred = dt.predict(featuresTest)
-
+    
+    gtTest_numeric=gtTest.apply(lambda x: 1 if x == 'Dropout' else 0)
+    gtPred_numeric=pd.Series(gtPred).apply(lambda x: 1 if x == 'Dropout' else 0)
     # Create the confusion matrix
-    cm = confusion_matrix(gtTest, gtPred)
+    cm = confusion_matrix(gtTest_numeric, gtPred_numeric)
     
-    
-    
+    print(gtTest.value_counts())    
     
     
     # Return the trained model
@@ -82,16 +85,16 @@ def train_model(dataset,params,split,id_model):
     tp = tp.item() if isinstance(tp, np.int64) else tp
 
     # Calculate F1 score
-    f1 = f1_score(gtTest, gtPred, pos_label='Dropout')
+    f1 = f1_score(gtTest_numeric, gtPred_numeric)
 
     # Calculate ROC AUC
-    roc_auc = (tp / (tp + fn) + tn / (tn + fp)) / 2
+    roc_auc = roc_auc_score(gtTest_numeric, gtPred_numeric)
 
     # Calculate recall
-    recall = recall_score(gtTest, gtPred, pos_label='Dropout')
+    recall = recall_score(gtTest_numeric, gtPred_numeric)
 
     # Calculate precision
-    precision = precision_score(gtTest, gtPred, pos_label='Dropout')
+    precision = precision_score(gtTest_numeric, gtPred_numeric)
 
     # Calculate accuracy
     accuracy = (tp + tn) / (tp + tn + fp + fn)
@@ -104,8 +107,8 @@ def train_model(dataset,params,split,id_model):
     
     # y_score = dt.predict_proba(featuresTest)[:, 1]
     plot_confusion_matrix(id_model)
-    # plot_precision_recall_curve(gtTest,gtPred,id_model)
-    # roc_curve(gtTest,y_score,id_model)
+    plot_precision_recall_curve(gtTest_numeric,gtPred_numeric,id_model)
+    plot_roc_curve(gtTest_numeric,gtPred_numeric,id_model)
     
     
     
@@ -176,7 +179,33 @@ def create_full_evaluation(model_id):
         print(f"An error occurred: {e}")
         return {}
     
-def predict(df,dfname):
+
+def predict(df, json_file):
+    
     model_id = int(retrieve_active_model_info()['id_modelo'][0])
     model = retrieve_model(model_id)
     
+    # Load the JSON file
+    with open(json_file) as f:
+        traducao = json.load(f)
+
+    # Replace the values in the DataFrame using the JSON file
+    df.replace(traducao, inplace=True)
+
+    # Apply one-hot encoding
+    enc = OneHotEncoder()
+    df_encoded = pd.DataFrame(enc.fit_transform(df).toarray(), columns=enc.get_feature_names(df.columns))
+
+    # Get the columns of the model's training data
+    model_columns = model.get_booster().feature_names
+
+    # Create a DataFrame of zeros with the same shape as the training data
+    df_template = pd.DataFrame(data=np.zeros((df_encoded.shape[0], len(model_columns))), columns=model_columns)
+
+    # Update the template with the encoded prediction data
+    df_template.update(df_encoded)
+
+    # Predict the labels for the prediction data
+    predictions = model.predict(df_template)
+
+    return predictions

@@ -27,10 +27,6 @@ meter certas paginas para ver so o docente
 ver avaliação nao ta com boa cara
 
 
-fazer butao de descarregar descarregar
-
-fazer butao de ativar modelo
-
 
 mudar a cena do document la em cima
 
@@ -47,3 +43,5 @@ perguntar sobre o grafico
 
 
 dataset e previsao tem de ser para cada utilizador diferente
+
+redirect do activate_model nao tem o tipo do utilizador, pode dar barraco
