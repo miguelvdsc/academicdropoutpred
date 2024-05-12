@@ -56,11 +56,21 @@
                         </thead>
                         <tbody>
                             {% for row in data %}
-                            <tr class="clickable-row" data-href="{{ url_for('show_dataset') }}" data-name="{{ row.name }}">
+                            <tr class="clickable-row" data-href="{{ url_for('precict_select_dataset') }}" data-name="{{ row.name }}">
                                 <th scope="row">{{ row.id_dataset }}</th>
                                 <td>{{ row.name }}</td>
-                                <td>{{ row.tipo }}</td>
-                                    <form action="{{ url_for('show_dataset') }}" method="POST" class="row-form">
+                                <td>{% if row.tipo == '1' %}
+                                    Para treinar
+                                {% elif row.tipo=='2' %}
+                                    Para Prever
+                                    
+                                {% elif row.tipo=='3' %} 
+                                    Previsão
+                                {% else %}
+                                {{ row.tipo }}
+                                {% endif %}
+                            </td>
+                                    <form action="{{ url_for('precict_select_dataset') }}" method="POST" class="row-form">
                                         <input type="hidden" name="id_dataset" value="{{ row.id_dataset }}">
                                     </form>
                                 </td>

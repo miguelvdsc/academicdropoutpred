@@ -2,12 +2,13 @@ from curses import flash
 import json
 from flask import Flask, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
+import pandas as pd
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
+from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
 from Modulos.database import modify_estado
-from Modulos.model import create_full_evaluation, train_model
+from Modulos.model import create_full_evaluation, predict, train_model
 
 app = Flask(__name__)
 
@@ -176,7 +177,7 @@ def create_model_dataset():
     if request.method=="POST":
         if 'nome' in request.form:
             nome_modelo = request.form.get('nome')
-        columns,data = select_from_table_dataset_type("treino")
+        columns,data = select_from_table_dataset_type(1)
         return render_template('create_model_dataset.html',user_type=current_user.tipo,data=data,columns=columns,nome_modelo=nome_modelo)
 
 @app.route('/create_model_dataset_param', methods=['GET', 'POST'])
@@ -324,5 +325,51 @@ def activate_model():
             return redirect(url_for('model_info'))
         return 'An error occurred'
     
+    
+@app.route('/precict_select_dataset',methods=['GET', 'POST'])
+@login_required
+def precict_select_dataset():
+    if request.method=="GET":
+        columns,data = retrieve_dataset_info_type(2)
+        return render_template('predict_select_dataset.html',user_type=current_user.tipo,columns=columns,data=data)
+    elif request.method=="POST" and 'id_dataset' in request.form:
+        id_dataset = request.form['id_dataset']
+        df = query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
+        df_name = query_to_dataframe('dataset', 'id_dataset',id_dataset)['name'].values[0]
+        
+        id_dataset=predict(df,df_name)
+        data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
+        data_five,columns_five=query_showdata_head(id_dataset)
+        lengc=len(columns_five)
+        dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
+        lengd=len(dd)
+        transdf=translate_categorical_variables(data_five,columns_five)
+        return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd)
+    
+@app.route('/predict_select_predictions',methods=['GET', 'POST'])
+@login_required
+def predict_select_predictions():
+    if request.method=="GET":
+        columns,data = retrieve_dataset_info_type(3)
+        return render_template('predict_select_predictions.html',user_type=current_user.tipo,columns=columns,data=data)
+    elif request.method=="POST" and 'id_dataset' in request.form:
+        id_dataset = request.form['id_dataset']
+        data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
+        data_five,columns_five=query_showdata_head(id_dataset)
+        lengc=len(columns_five)
+        dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
+        lengd=len(dd)
+        transdf=translate_categorical_variables(data_five,columns_five)
+        print(columns_five)
+        return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd)
+
+
+@app.route('/show_dt',methods=['GET', 'POST'])
+@login_required
+def show_dt():
+    if request.method=='POST' and 'id_modelo' in request.form:
+        id_modelo = request.form['id_modelo']
+        return render_template('show_dt.html', user_type=current_user.tipo,id_modelo=id_modelo)
+
 if __name__ == '__main__':
     app.run()

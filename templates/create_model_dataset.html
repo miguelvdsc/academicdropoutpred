@@ -53,7 +53,17 @@
                       <tr class="dataset-row" onclick="selectDataset(this, {{ row.id_dataset }})">
                         <th scope="row">{{ row.id_dataset }}</th>
                         <td>{{ row.name }}</td>
-                        <td>{{ row.tipo }}</td>
+                        <td>{% if row.tipo == '1' %}
+                          Para treinar
+                      {% elif row.tipo=='2' %}
+                          Para Prever
+                          
+                      {% elif row.tipo=='3' %} 
+                          Previsão
+                      {% else %}
+                      {{ row.tipo }}
+                      {% endif %}
+                  </td>
                       </tr>
                       {% endfor %}
                     </tbody>

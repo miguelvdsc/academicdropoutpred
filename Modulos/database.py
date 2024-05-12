@@ -694,14 +694,14 @@ def retrieve_dataset_info_type(tipo):
     """
     # Create a connection to the PostgreSQL database
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
-
+    with engine.connect() as conn:
     # Define your SQL query
-    query = sql.text(f"SELECT * FROM dataset WHERE tipo = '{tipo}'")
+        query = sql.text(f"SELECT * FROM dataset WHERE tipo = '{tipo}'")
 
-    result = engine.execute(query)
-    columns = result.keys()
-    data = result.fetchall()
-    return columns, data
+        result = conn.execute(query)
+        columns = result.keys()
+        data = result.fetchall()
+        return columns, data
     
     
 def store_evaluation(id_model,accuracy,precision,recall,roc_auc,f1_score,tn,fp,fn,tp):
@@ -720,3 +720,26 @@ def store_evaluation(id_model,accuracy,precision,recall,roc_auc,f1_score,tn,fp,f
         except Exception as e:
             print(f"An error occurred: {e}")
             return False
+        
+
+def store_dataset_pred_read(df,name,tipo):
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        try:            
+            query = sql.text("INSERT INTO dataset (name, tipo) VALUES (:name, :tipo) RETURNING id_dataset")
+            params = {'name': name, 'tipo': tipo}
+            result = conn.execute(query, params)
+            id = result.fetchone()[0]
+            
+            # Add a new column to the DataFrame with the ID
+            df['id_dataset'] = id
+            
+            # Insert the DataFrame into the 'dataset_atributos' table
+            df.to_sql('dataset_atributos', conn, if_exists='append', index=False)
+            
+            conn.commit()
+            
+            return id
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            

@@ -1,6 +1,9 @@
     
 import numpy as np
 from scipy import stats
+import pandas as pd
+import json
+from sklearn.preprocessing import OneHotEncoder
 
 #metodo de imputação
 def handle_nans(dataset, column, method='mean'):
@@ -71,4 +74,82 @@ def translate_categorical_variables(data,columns):
                 new_d.append(d[i])
         new_data.append(new_d)
     return new_data
+    
+def one_hot_encode(df, json_file):
+    import pandas as pd
+    from sklearn.preprocessing import OneHotEncoder
+    import json
+
+    # Load the JSON file
+    with open(json_file) as f:
+        traducao = json.load(f)
+
+    # Identify the columns to be one-hot encoded
+    columns_to_encode = list(traducao.keys())
+
+    # Separate the non-categorical and categorical variables
+    non_categorical_df = df.drop(columns_to_encode, axis=1)
+    categorical_df = df[columns_to_encode]
+
+    # Apply one-hot encoding
+    enc = OneHotEncoder()
+    df_encoded = pd.DataFrame(enc.fit_transform(categorical_df).toarray(), 
+                              columns=enc.get_feature_names_out(input_features=columns_to_encode))
+    dump(enc, 'OneHotEncoder.joblib')
+
+    # Replace the encoded column names with the corresponding values from the JSON file
+    for col in df_encoded.columns:
+        feature, value = col.split('_')
+        if feature in traducao and value in traducao[feature]:
+            df_encoded.rename(columns={col: f'{feature}_{traducao[feature][value]}'}, inplace=True)
+
+    # Convert the dataframes to numpy arrays and concatenate them
+    df_final = pd.DataFrame(np.hstack([non_categorical_df.values, df_encoded.values]), 
+                            columns=list(non_categorical_df.columns) + list(df_encoded.columns))
+
+    return df_final
+
+from joblib import dump, load
+
+def oneHotEncode_pred(df, json_file):
+    import pandas as pd
+    import json
+
+    # Load the JSON file
+    with open(json_file) as f:
+        traducao = json.load(f)
+
+    # Load the OneHotEncoder model
+    enc = load('OneHotEncoder.joblib')
+
+    # Identify the columns to be one-hot encoded
+    columns_to_encode = list(traducao.keys())
+    
+    
+    
+    # print('DataFrame columns:', df.columns)
+    # print('Columns to encode:', columns_to_encode)
+
+
+    # Separate the non-categorical and categorical variables
+    non_categorical_df = df.drop(columns_to_encode, axis=1)
+    categorical_df = df[columns_to_encode]
+
+    # Apply the encoder to the DataFrame
+    df_encoded = pd.DataFrame(enc.transform(categorical_df).toarray(), 
+                              columns=enc.get_feature_names_out(input_features=columns_to_encode))
+
+    # Replace the encoded column names with the corresponding values from the JSON file
+    for col in df_encoded.columns:
+        feature, value = col.split('_')
+        if feature in traducao and value in traducao[feature]:
+            df_encoded.rename(columns={col: f'{feature}_{traducao[feature][value]}'}, inplace=True)
+
+    
+
+    # Convert the dataframes to numpy arrays and concatenate them
+    df_final = pd.DataFrame(np.hstack([non_categorical_df.values, df_encoded.values]), 
+                            columns=list(non_categorical_df.columns) + list(df_encoded.columns))
+
+    return df_final
     

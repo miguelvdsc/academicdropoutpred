@@ -1,30 +1,14 @@
 to do:
 
-vericicações na cena do type hidden
+
 meter mensagens de confirmação (deu certo ou nao)
 
-falta ver a cena de treinar dataset ta a dar 0.78
-passar o id do dataset pelo form e ver como passo pra dataframe qnd ler da base de dados
 
 mudar cor quando seleciona o dataset no modelo
-
-onehot encode pode dar barraco por causa do list nao ter feito à mao
-
-
-metricas roc auc,f1, recall,precision,acc
-
-mudar o a cena do admin do modelo autor
-
-mudar [10 rows x 67 columns] tem de ficar sempre 253
-
-
 
 
 
 meter certas paginas para ver so o docente
-
-
-ver avaliação nao ta com boa cara
 
 
 
@@ -36,12 +20,16 @@ verificacao de ficheiro tipo csv e isso
 
 no select do dataset qnd for pra prever tirar o target, e mudar o tipo para oq corresponde
 
-Mudar export para os tipos de dataset
-
-
-perguntar sobre o grafico
 
 
 dataset e previsao tem de ser para cada utilizador diferente
 
 redirect do activate_model nao tem o tipo do utilizador, pode dar barraco
+
+
+VER SE TA A SER BEM FEITA A PREVISAO debug
+
+
+dar as opções direitas nos parametros
+
+falta tirar ativar modelo no modelo ativo

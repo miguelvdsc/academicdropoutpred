@@ -34,7 +34,17 @@
                         </div>
             
         <h6 class="ml-md-20px"><strong>Nome do Dataset:</strong> {{ row.name }}</h6>
-        <h6 class="ml-md-20px"><strong>Tipo:</strong> {{ row.tipo }}</h6>
+        <h6 class="ml-md-20px"><strong>Tipo:</strong> {% if row.tipo == '1' %}
+            Para treinar
+        {% elif row.tipo=='2' %}
+            Para Prever
+            
+        {% elif row.tipo=='3' %} 
+            Previsão
+        {% endif %}</h6>
+        
+        
+        </h6>
         
     {% endfor %}
 {% else %}
