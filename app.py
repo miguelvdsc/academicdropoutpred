@@ -6,7 +6,7 @@ import pandas as pd
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
+from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_estado, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
 from Modulos.database import modify_estado
 from Modulos.model import create_full_evaluation, predict, train_model
 
@@ -83,12 +83,14 @@ def register():
 @login_required
 def desativar():
     if request.method == 'POST':
-        selected_ids = request.args.getlist('user_id')
+        selected_ids = request.form.getlist('user_id')
+        
         for id in selected_ids:
             modify_estado(id)
-        return render_template('desativar.html',user_type=current_user.tipo)
+        columns, data = select_from_table_estado('users')
+        return render_template('desativar.html',user_type=current_user.tipo,columns=columns, data=data)
     elif request.method == 'GET':
-        columns, data = select_from_table('users')
+        columns, data = select_from_table_estado('users')
         return render_template('desativar.html', columns=columns, data=data,user_type=current_user.tipo)
 
 @app.route('/changepw')

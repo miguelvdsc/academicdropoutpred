@@ -8,14 +8,9 @@ mudar cor quando seleciona o dataset no modelo
 
 
 
-meter certas paginas para ver so o docente
-
-
-
-mudar a cena do document la em cima
-
-
 verificacao de ficheiro tipo csv e isso
+
+mudar icon administracao
 
 
 no select do dataset qnd for pra prever tirar o target, e mudar o tipo para oq corresponde

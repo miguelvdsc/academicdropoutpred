@@ -34,8 +34,8 @@
                         <tr>
                           <td>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="{{ row.id }}" {% if row.estado == 1 %}checked{% endif %}>
-                            </div>
+                              <input type="checkbox" class="custom-control-input" name="user_id" id  value="{{ row.id }}" {% if row.estado == 1 %}{% endif %}>
+                          </div>
                           </td>
                           {% for item in row %}
                             

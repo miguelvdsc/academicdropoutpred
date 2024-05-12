@@ -743,3 +743,23 @@ def store_dataset_pred_read(df,name,tipo):
         except Exception as e:
             print(f"An error occurred: {e}")
             
+        
+def select_from_table_estado(table):
+    """
+    Retrieve all rows from the specified table in the database.
+
+    Args:
+        table (str): The name of the table to select from.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - columns (list): A list of column names in the selected table.
+            - data (list): A list of tuples representing the rows of data from the selected table.
+    """
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"SELECT * FROM {table} where estado=1")
+        result = conn.execute(query)
+        columns = result.keys()
+        data = result.fetchall()
+        return columns, data
