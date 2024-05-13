@@ -10,12 +10,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.5/css/dataTables.dataTables.min.css">
     
     <title>Dados</title>
-    <style>
-        div.dt-container {
-            width: 800px;
-            margin: 0 auto;
-        }
-    </style>
 </head>
 {% extends 'sidebarbase.html' %}
 {% block body %}
@@ -24,18 +18,20 @@
         
         <div class="container my-5 mb-4">
             <h4 class="ml-md-20px">Dataset</h4>
-            <div class="ml-md-20px mt-md-15px">
+            <div class="d-flex flex-column flex-md-row ml-md-20px mt-md-15px">
                 {% if data %}
     {% for row in data %}
-                <form method="post" action="{{ url_for('export_ds') }}">
+                <form method="post" action="{{ url_for('export_ds') }}" class="mb-2 mb-md-0 mr-md-2">
                     <input type="hidden" name="id_dataset" value="{{row.id_dataset}}">
                     <input type="hidden" name="tipo" value="{{row.tipo}}">
-                    <button class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px;" type="submit">Descarregar Dataset</button>
+                    <button class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px; margin-right: 5px;" type="submit">Descarregar Dataset</button>
                 </form>
-                        </div>
-            
-        <h6 class="ml-md-20px"><strong>Nome do Dataset:</strong> {{ row.name }}</h6>
-        <h6 class="ml-md-20px"><strong>Tipo:</strong> {% if row.tipo == '1' %}
+                    </div>
+            </div>
+            <div class="container coiso mb-3">
+                
+        <h6 ><strong>Nome do Dataset:</strong> {{ row.name }}</h6>
+        <h6 ><strong>Tipo:</strong> {% if row.tipo == '1' %}
             Para treinar
         {% elif row.tipo=='2' %}
             Para Prever
@@ -51,16 +47,16 @@
 {% else %}
     <h6>No columns found</h6>
 {% endif %}
-        <h6 class="ml-md-20px"><strong>Numero de colunas:</strong> {{ lengc }}</h6>
-        <h6 class="ml-md-20px"><strong>Numero de linhas:</strong> {{ lengd }}</h6>
+        <h6><strong>Numero de colunas:</strong> {{ lengc }}</h6>
+        <h6><strong>Numero de linhas:</strong> {{ lengd }}</h6>
+    </div>
 
             <style>
                 .fixed-width {
                     min-width: 200px; /* Adjust as needed */
                 }
             </style>
-
-            <div class="container mt-5">
+        <div class="container coiso">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -92,6 +88,16 @@
     
 
 </body>
+<style>
+    @media (min-width: 768px) {
+        
+        .coiso {
+            padding-right: 32px !important;
+            padding-left: 32px !important;
+        }
+    }
+   
+    </style>
 </html>
 
 <script src="https://cdn.datatables.net/2.0.5/js/dataTables.dataTables.min.js"></script>

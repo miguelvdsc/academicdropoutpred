@@ -8,7 +8,7 @@ mudar cor quando seleciona o dataset no modelo
 
 
 
-verificacao de ficheiro tipo csv e isso
+verificacao de ficheiro tipo csv e isso (so mostrar ERRO)
 
 mudar icon administracao
 
@@ -28,3 +28,5 @@ VER SE TA A SER BEM FEITA A PREVISAO debug
 dar as opções direitas nos parametros
 
 falta tirar ativar modelo no modelo ativo
+
+a dar scroll no selecionar quando puxo para baixo aquilo fica muito para cima

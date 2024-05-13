@@ -35,6 +35,16 @@
                 <div class="register-header text-center">
                   <h2>Carregar Dataset</h2>
                 </div>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert alert-info">
+                      {% for message in messages %}
+                        {{ message }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
                 <form action="{{ url_for('dados_upload_file') }}" method="POST" enctype="multipart/form-data">
                   <div class="mb-3">
                     <label for="fileda" class="form-label">Dataset</label>
@@ -52,7 +62,7 @@
                       <!-- Add more options as needed -->
                     </select>
                   </div>
-                  <button type="submit" class="btn btn-primary w-100">Enviar</button>
+                  <button class="btn btn-light w-100" style="background:#BED7EA;border-radius: 10px;" type="submit">Enviar</button>
                 </form>
               </div>
             </div>

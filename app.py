@@ -1,4 +1,4 @@
-from curses import flash
+from flask import flash
 import json
 from flask import Flask, redirect, render_template, request, send_file, url_for
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
@@ -143,6 +143,7 @@ def dados_upload_file():
         type = request.form['tipo']
         print(file,name,type)
         store_dataset(file,name,type)
+        flash("Ficheiro carregado com sucesso", 'success')
         return render_template('dados_upload_file.html',user_type=current_user.tipo)
     
     

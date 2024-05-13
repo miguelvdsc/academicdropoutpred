@@ -40,8 +40,7 @@
             <div class="col-lg-6">
               <div class="register-container mt-5 scrollable-container">
                 <div class="register-header text-center">
-                  <h2>Parametros</h2>
-                  <h4>Nome do Modelo</h4>
+                  <h2>Paramêtros</h2>
                 </div>
                 <form action="{{ url_for('model') }}" method="POST">
                 <input type="hidden" name="nomem" id="nomem" value="{{nome_modelo}}">
@@ -99,8 +98,8 @@
                 <label for="monotonic_cst" class="form-label"><strong>Monotonic CST</strong></label>
                 <input value="" name="monotonic_cst" id="monotonic_cst" class="form-control" type="text">
               </div>
-              <button type="submit" class="btn btn-light w-100">Enviar</button>
-              </form>
+              <button class="btn btn-light w-100" style="background:#BED7EA; border-radius: 10px;" type="submit">Enviar</button>
+            </form>
               </div>
             </div>
           </div>

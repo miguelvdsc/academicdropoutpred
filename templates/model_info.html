@@ -30,7 +30,7 @@
                     
             </div>
         </div>
-            <div class="container ml-md-20px">
+            <div class="container coiso">
                 <div class="row">
                     <h6><strong>Paramêtros do Modelo:</strong></h6>
                     <!-- First main column -->
@@ -72,7 +72,7 @@
 
                     <!-- Second main column -->
                     <div class="col-sm-6">
-                        <div class="pr-3 pr-md-32px">
+                        <div class="pr-3">
                             <img src="/static/graphs/model_{{ id }}_confusion_matrix.svg" alt="Confusion Matrix" class="img-fluid">
                             <img src="/static/graphs/model_{{ id }}_precision_recall_curve.svg" alt="Precision Recall" class="img-fluid">
                             <img src="/static/graphs/model_{{ id }}_roc_curve.svg" alt="ROC curve" class="img-fluid">
@@ -89,6 +89,10 @@
 @media (min-width: 768px) {
     .pr-md-32px {
         padding-right: 32px !important;
+    }
+    .coiso {
+        padding-right: 32px !important;
+        padding-left: 32px !important;
     }
 }
 @media (min-width: 768px) {

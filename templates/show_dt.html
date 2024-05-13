@@ -23,7 +23,7 @@
 <section class="home">
     <div class="container my-5 mb-4">
         <h4 class="ml-md-20px">Árvore de Decisão</h4>
-        <div class="ml-md-20px mt-md-15px">
+        <div class="d-flex flex-column flex-md-row ml-md-20px mt-md-15px">
             <form method="POST" action="{{ url_for('model_hist_view') }}">
                 <input type="hidden" name="id_modelo" value="{{ id_modelo }}">
                 <button class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px;" type="submit">Voltar ao modelo</button>
@@ -31,39 +31,63 @@
                 
         </div>
     </div>
-    <div class="container mt-5">
+    <div class="container mb-4 coiso">
         <div class="row">
+            <div class="mb-3">
+                <button id="zoom-in-btn" class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px;"><i class="bi bi-zoom-in"></i> Zoom In</button>
+                <button id="zoom-out-btn" class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px;"><i class="bi bi-zoom-out"></i> Zoom Out</button>
+            </div>
             <div class="col-12">
-                <div class="img-box" style="width: 100%; height: 500px; overflow: auto; position: relative;">
+                <div class="img-box" style="width: 100%; height: 550px; overflow: auto; position: relative;">
                     <div id="zoom-image" style="position: absolute;">
                         <img id="myimage" src="static/dt/{{id_modelo}}_decision_tree.png" class="img-fluid" style="transform-origin: 0 0;" alt="Your Image">
                     </div>
                 </div>
-                <button id="zoom-in-btn" class="btn btn-primary btn-lg rounded-pill">Zoom In</button>
-                <button id="zoom-out-btn" class="btn btn-secondary btn-lg rounded-pill">Zoom Out</button>
+                
             </div>
         </div>
     </div>
 </section>
-
+<style>
+    @media (min-width: 768px) {
+        .pr-md-32px {
+            padding-right: 32px !important;
+        }
+        .coiso {
+            padding-right: 32px !important;
+            padding-left: 32px !important;
+        }
+    }
+    @media (min-width: 768px) {
+        .ml-md-20px {
+            margin-left: 20px !important;
+        }
+        .ml-md-20px {
+            margin-left: 20px !important;
+        }
+        .mt-md-15px {
+            margin-top: 15px !important;
+        }
+    }
+    </style>
 
 <script>
     window.onload = function() {
         var img = document.getElementById('myimage');
         var zoomInBtn = document.getElementById('zoom-in-btn');
         var zoomOutBtn = document.getElementById('zoom-out-btn');
-        var zoomLevel = 2; // set an initial zoom level greater than 1
+        var zoomLevel = 1; // set an initial zoom level greater than 1
     
         img.style.transform = 'scale(' + zoomLevel + ')'; // apply the initial scale transformation
     
         zoomInBtn.onclick = function() {
-            zoomLevel += 1; // increase the zoom level by 1
+            zoomLevel += 0.5; // increase the zoom level by 1
             img.style.transform = 'scale(' + zoomLevel + ')';
         }
     
         zoomOutBtn.onclick = function() {
             if (zoomLevel > 1) { // ensure the zoom level doesn't go below 1
-                zoomLevel -= 1; // decrease the zoom level by 1
+                zoomLevel -= 0.5; // decrease the zoom level by 1
                 img.style.transform = 'scale(' + zoomLevel + ')';
             }
         }
