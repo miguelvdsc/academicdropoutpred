@@ -51,7 +51,7 @@ def train_model(dataset,params,split,id_model):
     dt = tree.DecisionTreeClassifier(**params)
     dt = dt.fit(featuresTrain,gtTrain)
     
-    plt.figure(figsize=(30, 10))  # set the size of the figure
+    plt.figure(figsize=(15, 10))  # set the size of the figure
     tree.plot_tree(dt, filled=True, feature_names=features.columns, class_names=['Graduate', 'Dropout'])
     plt.savefig(f'static/dt/{id_model}_decision_tree.png',dpi=700)  # save the figure to a file
     

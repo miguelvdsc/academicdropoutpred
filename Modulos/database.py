@@ -183,6 +183,8 @@ def store_dataset(dataset,name,tipo):
             df.to_sql('dataset_atributos', conn, if_exists='append', index=False)
             
             conn.commit()
+            
+            return True
         except Exception as e:
             print(f"An error occurred: {e}")
             
@@ -424,7 +426,7 @@ def query_showdata_head(id):
     # Get a Connection object from the Engine
     with engine.connect() as connection:
         query = sql.text(f"""
-        SELECT "Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Target", "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification", "Curricular units 1st sem (approved)", "Curricular units 2nd sem (approved)"
+        SELECT "Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification", "Curricular units 1st sem (approved)", "Curricular units 2nd sem (approved)","Target"
         FROM dataset_atributos WHERE id_dataset = :id_dataset
         LIMIT 5
     """)
@@ -759,6 +761,55 @@ def select_from_table_estado(table):
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
         query = sql.text(f"SELECT * FROM {table} where estado=1")
+        result = conn.execute(query)
+        columns = result.keys()
+        data = result.fetchall()
+        return columns, data
+    
+    
+def select_from_table_model(table):
+    """
+    Retrieve all rows from the specified table in the database.
+
+    Args:
+        table (str): The name of the table to select from.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - columns (list): A list of column names in the selected table.
+            - data (list): A list of tuples representing the rows of data from the selected table.
+    """
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"""
+            SELECT {table}.id_modelo, {table}.nome, avaliacao.roc_auc, avaliacao.f1_score
+            FROM {table}
+            INNER JOIN avaliacao ON {table}.id_modelo = avaliacao.id_modelo
+            WHERE {table}.is_active = False
+            Order by {table}.id_modelo
+        """)
+        result = conn.execute(query)
+        
+        columns = result.keys()
+        data = result.fetchall()
+        print(columns,data)
+        return columns, data
+
+def select_from_table_estado_spe(table):
+    """
+    Retrieve all rows from the specified table in the database.
+
+    Args:
+        table (str): The name of the table to select from.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - columns (list): A list of column names in the selected table.
+            - data (list): A list of tuples representing the rows of data from the selected table.
+    """
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"SELECT id,name,tipo FROM {table} where estado=1")
         result = conn.execute(query)
         columns = result.keys()
         data = result.fetchall()

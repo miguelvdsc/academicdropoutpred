@@ -6,7 +6,7 @@ import pandas as pd
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_estado, select_from_table_id_one_dataset, select_head_dataset, set_active_model, store_dataset
+from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_estado, select_from_table_estado_spe, select_from_table_id_one_dataset, select_from_table_model, select_head_dataset, set_active_model, store_dataset
 from Modulos.database import modify_estado
 from Modulos.model import create_full_evaluation, predict, train_model
 
@@ -56,14 +56,7 @@ def login():
 @app.route('/handle_register', methods=['GET', 'POST'])
 @login_required
 def handle_register():
-    name = request.form['name']
-    email= request.form['email']
-    password = request.form['password']
-    confirmpassword = request.form['confirmpassword']
-    cargo = request.form['cargo']
-    if(password==confirmpassword):
-        if register_user(name,email,password,cargo):
-            return render_template('login.html',user_type=current_user.tipo)
+    
     return render_template('register.html',user_type=current_user.tipo)
     
         
@@ -74,11 +67,27 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 @login_required
 def register():
-    return render_template('register.html',user_type=current_user.tipo)
-
+    if request.method=='GET':
+        return render_template('register.html',user_type=current_user.tipo)
+    elif request.method=='POST':
+        name = request.form['name']
+        email= request.form['email']
+        password = request.form['password']
+        confirmpassword = request.form['confirmpassword']
+        cargo = request.form['cargo']
+        if(password==confirmpassword):
+            if register_user(name,email,password,cargo):
+                flash("Utilizador registado com sucesso", 'success')
+                return render_template('register.html',user_type=current_user.tipo)
+            else:
+                flash("Erro ao registar utilizador", 'danger')
+                return render_template('register.html',user_type=current_user.tipo)
+        else:
+            flash("Passwords não coincidem", 'danger')
+            return render_template('register.html',user_type=current_user.tipo)
 @app.route('/desativar',methods=['GET', 'POST'])
 @login_required
 def desativar():
@@ -93,11 +102,28 @@ def desativar():
         columns, data = select_from_table_estado('users')
         return render_template('desativar.html', columns=columns, data=data,user_type=current_user.tipo)
 
-@app.route('/changepw')
+@app.route('/changepw', methods=['GET', 'POST'])
 @login_required
 def changepw():
-    return render_template('changepw.html',user_type=current_user.tipo)
-    
+    if request.method=="GET":
+        return render_template('changepw.html',user_type=current_user.tipo)
+    elif request.method=="POST":
+        id = current_user.id
+        password = request.form.get('password')
+        confirmpassword = request.form.get('confirmpassword')
+        if password and confirmpassword and password == confirmpassword:
+            if change_password(id, password):
+                flash("Password alterada com sucesso", 'success')
+                return render_template('changepw.html',user_type=current_user.tipo)
+                
+            else:
+                flash("Erro ao alterar password", 'danger')
+                return render_template('changepw.html',user_type=current_user.tipo)
+        else:
+            flash("Passwords não coincidem", 'danger')
+            return render_template('changepw.html',user_type=current_user.tipo)
+        
+        
 @app.route('/changepass', methods=['GET', 'POST'])
 @login_required
 def changepass():
@@ -142,8 +168,10 @@ def dados_upload_file():
         name = request.form['nome']
         type = request.form['tipo']
         print(file,name,type)
-        store_dataset(file,name,type)
-        flash("Ficheiro carregado com sucesso", 'success')
+        if store_dataset(file,name,type):
+            flash("Ficheiro carregado com sucesso", 'success')
+        else:
+            flash("Erro ao carregar ficheiro", 'danger')
         return render_template('dados_upload_file.html',user_type=current_user.tipo)
     
     
@@ -195,7 +223,6 @@ def create_model_dataset_param():
             divi = request.form.get('divi')
         if 'selected_dataset' in request.form:
             selected_dataset = request.form.get('selected_dataset') 
-           
         print(nome_modelo,divi,selected_dataset)
         return render_template('create_model_dataset_param.html',user_type=current_user.tipo,nome_modelo=nome_modelo,divi=divi,selected_dataset=selected_dataset)
         
@@ -289,21 +316,24 @@ def model_info():
 @app.route('/select_model')
 @login_required
 def select_model():
-    columns, data = select_from_table('modelo')
+    columns, data = select_from_table_model('modelo')
     return render_template('select_model.html',user_type=current_user.tipo,columns=columns,data=data)        
             
 @app.route('/model_hist_view',methods=['GET', 'POST'])
 @login_required
 def model_hist_view():
     if request.method=="POST" and 'id_modelo' in request.form:
+        mativo=retrieve_active_model_info()['id_modelo'].values[0]
+        print(mativo)
         id_modelo = request.form['id_modelo']
+        print(id_modelo)
         data = retrieve_model_info_dataf('modelo',id_modelo)
         parametros = data['parametros'].values[0]
         nome=data['nome'].values[0]
         id=data['id_modelo'].values[0]
         id_dataset=data['id_dataset'].values[0]
         eval=get_evaluation(id)
-        return render_template('model_hist_view.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id,eval=eval,id_dataset=id_dataset)
+        return render_template('model_hist_view.html', user_type=current_user.tipo, parametros=parametros,nome=nome,id=id,eval=eval,id_dataset=id_dataset,mativo=mativo)
             
 
 @app.route('/export_ds',methods=[ 'POST'])

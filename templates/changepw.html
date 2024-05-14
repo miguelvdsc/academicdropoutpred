@@ -32,7 +32,17 @@
             <div class="register-header">
               <h2>Mudar Palavra-passe</h2>
             </div>
-            <form action="{{ url_for('changepass') }}" method="POST">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+            <form action="{{ url_for('changepw') }}" method="POST">
               <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" name="password" id="password" placeholder="Introduza a password">
@@ -42,7 +52,7 @@
                 <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="Confirme a password">
               </div>
             
-              <button type="submit" class="btn btn-light w-100">Register</button>
+              <button type="submit" style="background:#BED7EA;border-radius: 10px;" class="btn btn-light w-100">Confirmar</button>
             </form>
           </div>
           
