@@ -26,8 +26,16 @@
                     <input type="hidden" name="tipo" value="{{row.tipo}}">
                     <button class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px; margin-right: 5px;" type="submit">Descarregar Dataset</button>
                 </form>
+                {% if row.tipo != '3' %}
+                <form method="post" action="{{ url_for('tratar_d') }}" class="mb-2 mb-md-0 mr-md-2">
+                    <input type="hidden" name="id_dataset" value="{{row.id_dataset}}">
+                    <button class="btn btn-light" style="background:#BED7EA; padding: 2px 10px; border-radius: 10px; margin-right: 5px;" type="submit">Tratar Dados</button>
+                </form>
+                {% endif %}
                     </div>
             </div>
+
+
             <div class="container coiso mb-3">
                 
         <h6 ><strong>Nome do Dataset:</strong> {{ row.name }}</h6>

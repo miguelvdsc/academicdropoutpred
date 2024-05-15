@@ -418,18 +418,26 @@ def retrieve_model_info(table, id_modelo):
 #         print(str(e))
 #         return False
     
-def query_showdata_head(id):
+def query_showdata_head(id,tipo):
 
     # Create a connection to the PostgreSQL database
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
 
     # Get a Connection object from the Engine
     with engine.connect() as connection:
-        query = sql.text(f"""
-        SELECT "Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification", "Curricular units 1st sem (approved)", "Curricular units 2nd sem (approved)","Target"
-        FROM dataset_atributos WHERE id_dataset = :id_dataset
-        LIMIT 5
-    """)
+        if(tipo=="2"):
+            query = sql.text(f"""
+            SELECT "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)"
+            FROM dataset_atributos WHERE id_dataset = :id_dataset
+            LIMIT 5
+            """)
+        else:
+            query = sql.text(f"""
+            SELECT "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Target"
+            FROM dataset_atributos WHERE id_dataset = :id_dataset
+            LIMIT 5
+            """)
+            
         result = connection.execute(query, {'id_dataset': id})
         columns = result.keys()
         data = result.fetchall()
@@ -653,13 +661,13 @@ def export_dataset(id_dataset,tipo):
             # Define the SQL query
             if(tipo=="2"):
                 query = sql.text(f"""
-                SELECT "Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification", "Curricular units 1st sem (approved)", "Curricular units 2nd sem (approved)"
+                SELECT  "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)"
                 FROM dataset_atributos
                 WHERE id_dataset = :id_dataset
                 """)
             else:
                 query = sql.text(f"""
-                SELECT "Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Target", "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification", "Curricular units 1st sem (approved)", "Curricular units 2nd sem (approved)"
+                SELECT  "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Target"
                 FROM dataset_atributos
                 WHERE id_dataset = :id_dataset
                 """)
@@ -814,3 +822,42 @@ def select_from_table_estado_spe(table):
         columns = result.keys()
         data = result.fetchall()
         return columns, data
+    
+def check_if_name(name):
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"SELECT * FROM users WHERE name='{name}'")
+        result = conn.execute(query)
+        data = result.fetchall()
+        if data:
+            return True
+        else:
+            return False
+
+def select_from_table_type1_2(table):
+    """
+    Retrieve all rows from the specified table in the database.
+
+    Args:
+        table (str): The name of the table to select from.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - columns (list): A list of column names in the selected table.
+            - data (list): A list of tuples representing the rows of data from the selected table.
+    """
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"SELECT * FROM {table} WHERE tipo = '1' OR tipo = '2' ")
+        result = conn.execute(query)
+        columns = result.keys()
+        data = result.fetchall()
+        return columns, data
+    
+def select_type_fromdb(id_dataset):
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"SELECT tipo FROM dataset WHERE id_dataset = {id_dataset}")
+        result = conn.execute(query)
+        data = result.fetchall()
+        return data[0][0]

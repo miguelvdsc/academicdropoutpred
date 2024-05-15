@@ -6,7 +6,7 @@ import pandas as pd
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_estado, select_from_table_estado_spe, select_from_table_id_one_dataset, select_from_table_model, select_head_dataset, set_active_model, store_dataset
+from Modulos.database import change_password, check_if_name, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_estado, select_from_table_estado_spe, select_from_table_id_one_dataset, select_from_table_model, select_from_table_type1_2, select_head_dataset, select_type_fromdb, set_active_model, store_dataset
 from Modulos.database import modify_estado
 from Modulos.model import create_full_evaluation, predict, train_model
 
@@ -51,6 +51,10 @@ def login():
             user=user_loader(idd)
             login_user(user)
             return render_template('index.html',user_type=current_user.tipo)
+        
+        else:
+            flash("Credenciais inválidas", 'danger')
+            return render_template('login.html')
     return render_template('login.html')
 
 @app.route('/handle_register', methods=['GET', 'POST'])
@@ -78,6 +82,9 @@ def register():
         password = request.form['password']
         confirmpassword = request.form['confirmpassword']
         cargo = request.form['cargo']
+        if(check_if_name(name)):
+            flash("Nome de utilizador já existe", 'danger')
+            return render_template('register.html',user_type=current_user.tipo)
         if(password==confirmpassword):
             if register_user(name,email,password,cargo):
                 flash("Utilizador registado com sucesso", 'success')
@@ -178,7 +185,7 @@ def dados_upload_file():
 @app.route('/dados_select_dataset', methods=['GET'])
 @login_required
 def dados_select_dataset():
-        columns, data = select_from_table('dataset')
+        columns, data = select_from_table_type1_2('dataset')
         return render_template('dados_select_dataset.html', columns=columns, data=data,user_type=current_user.tipo)
     
 @app.route('/show_dataset', methods=['GET', 'POST'])
@@ -188,7 +195,8 @@ def show_dataset():
         id_dataset = request.form['id_dataset']
         if id_dataset:
             data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
-            data_five,columns_five=query_showdata_head(id_dataset)
+            tipos=select_type_fromdb(id_dataset)
+            data_five,columns_five=query_showdata_head(id_dataset,tipos)
             lengc=len(columns_five)
             dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
             lengd=len(dd)
@@ -372,7 +380,8 @@ def precict_select_dataset():
         
         id_dataset=predict(df,df_name)
         data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
-        data_five,columns_five=query_showdata_head(id_dataset)
+        tipos=select_type_fromdb(id_dataset)
+        data_five,columns_five=query_showdata_head(id_dataset,tipos)
         lengc=len(columns_five)
         dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
         lengd=len(dd)
@@ -388,7 +397,8 @@ def predict_select_predictions():
     elif request.method=="POST" and 'id_dataset' in request.form:
         id_dataset = request.form['id_dataset']
         data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
-        data_five,columns_five=query_showdata_head(id_dataset)
+        tipos=select_type_fromdb(id_dataset)
+        data_five,columns_five=query_showdata_head(id_dataset,tipos)
         lengc=len(columns_five)
         dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
         lengd=len(dd)
@@ -403,6 +413,13 @@ def show_dt():
     if request.method=='POST' and 'id_modelo' in request.form:
         id_modelo = request.form['id_modelo']
         return render_template('show_dt.html', user_type=current_user.tipo,id_modelo=id_modelo)
+
+@app.route('/tratar_d',methods=['GET', 'POST'])
+@login_required
+def tratar_d():
+    if request.method=='POST' and 'id_dataset' in request.form:
+        id_dataset=request.form['id_dataset']
+        return render_template('tratar_d.html', user_type=current_user.tipo,id_dataset=id_dataset)
 
 if __name__ == '__main__':
     app.run()

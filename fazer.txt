@@ -1,7 +1,5 @@
 to do:
 
-no select do dataset qnd for pra prever tirar o target.
-
 
 VER SE TA A SER BEM FEITA A PREVISAO debug
 
@@ -9,10 +7,9 @@ VER SE TA A SER BEM FEITA A PREVISAO debug
 dar as opções direitas nos parametros
 
 
-Mudar export meter target em ultimo
 
-erro do please login
+erro do please login(mudar o index,meter o login como principal)
 
-do dataset tirar o tipo=3 do selecionar normal
 
 depois vejo se mudo pra select_from_table_estado_spe no desativar conta
+
