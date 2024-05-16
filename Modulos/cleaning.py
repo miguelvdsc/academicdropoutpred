@@ -60,16 +60,18 @@ def handle_outliers(dataset, column, method='iqr'):
     
     return dataset
 
-def translate_categorical_variables(data,columns):
+def translate_categorical_variables(data, columns):
     import json
     with open('traducao.json') as f:
         categorical_mapping = json.load(f)
     new_data = []
     for d in data:
         new_d = []
-        for i,c in enumerate(columns):
-            if c in categorical_mapping:
+        for i, c in enumerate(columns):
+            if c in categorical_mapping and str(d[i]) in categorical_mapping[c]:
                 new_d.append(categorical_mapping[c][str(d[i])])
+            elif d[i] is None:
+                new_d.append(None)  # keep null values as None
             else:
                 new_d.append(d[i])
         new_data.append(new_d)

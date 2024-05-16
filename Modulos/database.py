@@ -429,12 +429,14 @@ def query_showdata_head(id,tipo):
             query = sql.text(f"""
             SELECT "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)"
             FROM dataset_atributos WHERE id_dataset = :id_dataset
+            ORDER BY id
             LIMIT 5
             """)
         else:
             query = sql.text(f"""
             SELECT "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Target"
             FROM dataset_atributos WHERE id_dataset = :id_dataset
+            ORDER BY id
             LIMIT 5
             """)
             
@@ -664,12 +666,14 @@ def export_dataset(id_dataset,tipo):
                 SELECT  "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)"
                 FROM dataset_atributos
                 WHERE id_dataset = :id_dataset
+                ORDER BY id
                 """)
             else:
                 query = sql.text(f"""
                 SELECT  "Marital status", "Application mode", "Application order", "Course", "Daytime/evening attendance", "Previous qualification", "Nacionality", "Mother's qualification","Father's qualification", "Mother's occupation", "Father's occupation", "Displaced", "Educational special needs", "Debtor", "Tuition fees up to date", "Gender", "Scholarship holder", "Age at enrollment", "International", "Curricular units 1st sem (credited)", "Curricular units 1st sem (enrolled)", "Curricular units 1st sem (evaluations)", "Curricular units 1st sem (approved)","Curricular units 1st sem (grade)", "Curricular units 1st sem (without evaluations)", "Curricular units 2nd sem (credited)", "Curricular units 2nd sem (enrolled)", "Curricular units 2nd sem (evaluations)", "Curricular units 2nd sem (approved)", "Curricular units 2nd sem (grade)", "Curricular units 2nd sem (without evaluations)", "Target"
                 FROM dataset_atributos
                 WHERE id_dataset = :id_dataset
+                ORDER BY id
                 """)
             # Execute the query and convert the result to a DataFrame
             df = pd.read_sql_query(query, engine, params={"id_dataset": id_dataset})
@@ -869,40 +873,76 @@ def set_n_mode_categorical(id_dataset):
         categorical_var = json.load(f)
     for column in df.columns:
         if column in categorical_var.keys():
-            mode=df[column].mode()[0]
+            mode=int(df[column].mode()[0])
             engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
             with engine.connect() as conn:
-                query = sql.text("""
-                UPDATE data_atributos
-                SET {column} = :mode
+                query = sql.text(f"""
+                UPDATE dataset_atributos
+                SET "{column}" = :mode
                 WHERE id_dataset = :id_dataset
-                AND {column} IS NULL or {column} = '0'
+                AND "{column}" is NULL or "{column}" = '0'
                 """)
+                params={"mode": mode, "id_dataset": id_dataset}
+                conn.execute(query, params)
+                conn.commit()
+            
+            update_dataset_alterações(id_dataset,'1')
+            
+            
+# def set_n_average_numerical(id_dataset):
+    
+#     df=query_to_dataframe('dataset_atributos','id_dataset',id_dataset)
+#     with open('traducao.json') as f:
+#         categorical_var = json.load(f)
+#     for column in df.columns:
+#         if column not in categorical_var.keys() and column != 'id_dataset':
+#             average=df[column].mean()
+#             engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+#             with engine.connect() as conn:
+#                 query = sql.text("""
+#                 UPDATE dataset_atributos
+#                 SET {column} = :average
+#                 WHERE id_dataset = :id_dataset
+#                 AND {column} = '0' or {column} = '0'
+#                 """)
 
-            params={"mode": mode, "id_dataset": id_dataset}
-            conn.execute(query, params)
-            conn.commit()
-            #acabar
+#             params={"mode": average, "id_dataset": id_dataset}
+#             conn.execute(query, params)
+#             conn.commit()
             
             
-def set_n_average_numerical(id_dataset):
+def set_null_elim(id_dataset):
     
     df=query_to_dataframe('dataset_atributos','id_dataset',id_dataset)
-    with open('traducao.json') as f:
-        categorical_var = json.load(f)
-    for column in df.columns:
-        if column not in categorical_var.keys():
-            average=df[column].mean()
-            engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
-            with engine.connect() as conn:
-                query = sql.text("""
-                UPDATE data_atributos
-                SET {column} = :average
+    q=""
+    columns = [col for col in df.columns if col != 'Target' and col != 'id_dataset' and col != 'id']
+    print(columns)
+    for column in columns:
+        q = q + f' OR "{column}" is NULL '
+    q = q.replace("OR ", " ", 1)
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+                query = sql.text(f"""
+                DELETE FROM dataset_atributos
                 WHERE id_dataset = :id_dataset
-                AND {column} IS NULL or {column} = '0'
+                AND {q}
                 """)
-
-            params={"mode": average, "id_dataset": id_dataset}
-            conn.execute(query, params)
-            conn.commit()
+                params = {"id_dataset": id_dataset}
+                conn.execute(query, params)
+                
+    
+                conn.commit()
             #acabar
+    update_dataset_alterações(id_dataset,'2')
+            
+def update_dataset_alterações(id_dataset,alteracoes):
+    engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+    with engine.connect() as conn:
+        query = sql.text(f"""
+        UPDATE dataset
+        SET alteracoes = :alteracoes
+        WHERE id_dataset = :id_dataset
+        """)
+        params={"id_dataset": id_dataset, "alteracoes": alteracoes}
+        conn.execute(query, params)
+        conn.commit()

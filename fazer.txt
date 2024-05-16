@@ -11,4 +11,6 @@ depois vejo se mudo pra select_from_table_estado_spe no desativar conta
 
 perguntar se pode dar problemas o varchar em algumas colunas
 
-no tratar dados, metor os botoes direitos
+ver se o translate ta bem
+
+falta redirecionar depois do tratar pro show_dataset

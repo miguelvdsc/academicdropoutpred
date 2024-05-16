@@ -57,6 +57,15 @@
 {% endif %}
         <h6><strong>Numero de colunas:</strong> {{ lengc }}</h6>
         <h6><strong>Numero de linhas:</strong> {{ lengd }}</h6>
+        <h6><strong>Numero de valores desconhecidos:</strong> {{ mv }}</h6>
+        <h6><strong>Alterações realizadas : </strong> {% if alt == 1 %}
+        Valores desconhecidos substituidos pela moda
+        {% elif alt == 2 %}
+        Linhas com valores desconhecidos eliminadas
+        {% else %}
+        Nenhuma alteração realizada
+        {% endif %} </h6>
+        </h6>
     </div>
 
             <style>

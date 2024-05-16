@@ -6,7 +6,7 @@ import pandas as pd
 import sqlalchemy
 
 from Modulos.cleaning import translate_categorical_variables
-from Modulos.database import change_password, check_if_name, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_estado, select_from_table_estado_spe, select_from_table_id_one_dataset, select_from_table_model, select_from_table_type1_2, select_head_dataset, select_type_fromdb, set_active_model, store_dataset
+from Modulos.database import change_password, check_if_name, check_if_user_exists, check_pass, export_dataset, get_evaluation, insert_into_model, login_query, query_showdata_head, query_to_dataframe, register_user, retrieve_active_model_info, retrieve_dataset_info_type, retrieve_model_info, retrieve_model_info_dataf, select_from_table, select_from_table_dataset_type, select_from_table_estado, select_from_table_estado_spe, select_from_table_id_one_dataset, select_from_table_model, select_from_table_type1_2, select_head_dataset, select_type_fromdb, set_active_model, set_n_mode_categorical, set_null_elim, store_dataset
 from Modulos.database import modify_estado
 from Modulos.model import create_full_evaluation, predict, train_model
 
@@ -202,7 +202,11 @@ def show_dataset():
             lengd=len(dd)
             transdf=translate_categorical_variables(data_five,columns_five)
             print(columns_five)
-            return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd)
+            dx=query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
+            mv = dx.drop('Target', axis=1).isnull().sum().sum()
+            print(mv)
+            alt=query_to_dataframe('dataset', 'id_dataset',id_dataset)['alteracoes'].values[0]
+            return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd,mv=mv,alt=alt)
         return render_template('index.html',user_type=current_user.tipo)
     
 @app.route('/create_model')
@@ -386,7 +390,10 @@ def precict_select_dataset():
         dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
         lengd=len(dd)
         transdf=translate_categorical_variables(data_five,columns_five)
-        return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd)
+        dx=query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
+        mv = dx.drop('Target', axis=1).isnull().sum().sum()
+        alt=query_to_dataframe('dataset', 'id_dataset',id_dataset)['alteracoes'].values[0]
+        return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd,mv=mv,alt=alt)
     
 @app.route('/predict_select_predictions',methods=['GET', 'POST'])
 @login_required
@@ -404,7 +411,10 @@ def predict_select_predictions():
         lengd=len(dd)
         transdf=translate_categorical_variables(data_five,columns_five)
         print(columns_five)
-        return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd)
+        dx=query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
+        mv = dx.drop('Target', axis=1).isnull().sum().sum()
+        alt=query_to_dataframe('dataset', 'id_dataset',id_dataset)['alteracoes'].values[0]
+        return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd,mv=mv,alt=alt)
 
 
 @app.route('/show_dt',methods=['GET', 'POST'])
@@ -424,6 +434,10 @@ def tratar_d():
         id_dataset=request.form['id_dataset']
         action=request.form['action']
         print(id_dataset,action)
+        if action=='moda':
+            set_n_mode_categorical(id_dataset)
+        elif action=='eliminar':
+            set_null_elim(id_dataset)
         return render_template('tratar_d.html', user_type=current_user.tipo,id_dataset=id_dataset)
 if __name__ == '__main__':
     app.run()

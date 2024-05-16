@@ -21,12 +21,12 @@
                 <form action="{{ url_for('tratar_d')}}" method="POST">
                     <input type="hidden" name="action" value="moda">
                     <input type="hidden" name="id_dataset" value="{{ id_dataset }}">
-                    <input type="submit" class="btn btn-light" style="background:#BED7EA" value="Substituir valores em falta pela moda em colunas categoricas"></input>
+                    <input type="submit" class="btn btn-light w-100" style="background:#BED7EA" value="Substituir valores em falta pela moda em colunas categoricas"></input>
                 </form>
                 <form action="{{ url_for('tratar_d')}}" method="POST">
-                    <input type="hidden" name="action" value="media">
+                    <input type="hidden" name="action" value="eliminar">
                     <input type="hidden" name="id_dataset" value="{{ id_dataset }}">
-                    <input type="submit" class="btn btn-light" style="background:#BED7EA" value="Substituir valores em falta pela media em colunas numéricas"></input>
+                    <input type="submit" class="btn btn-light w-100" style="background:#BED7EA" value="Eliminar linhas com valores desconhecidos"></input>
                 </form>
                   </div>
 
