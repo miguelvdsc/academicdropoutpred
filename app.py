@@ -417,9 +417,13 @@ def show_dt():
 @app.route('/tratar_d',methods=['GET', 'POST'])
 @login_required
 def tratar_d():
-    if request.method=='POST' and 'id_dataset' in request.form:
+    if request.method=='POST' and 'id_dataset' in request.form and 'action' not in request.form:
         id_dataset=request.form['id_dataset']
         return render_template('tratar_d.html', user_type=current_user.tipo,id_dataset=id_dataset)
-
+    elif request.method=='POST' and 'id_dataset' in request.form and 'action' in request.form:
+        id_dataset=request.form['id_dataset']
+        action=request.form['action']
+        print(id_dataset,action)
+        return render_template('tratar_d.html', user_type=current_user.tipo,id_dataset=id_dataset)
 if __name__ == '__main__':
     app.run()

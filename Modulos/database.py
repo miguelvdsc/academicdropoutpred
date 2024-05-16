@@ -861,3 +861,48 @@ def select_type_fromdb(id_dataset):
         result = conn.execute(query)
         data = result.fetchall()
         return data[0][0]
+    
+def set_n_mode_categorical(id_dataset):
+    
+    df=query_to_dataframe('dataset_atributos','id_dataset',id_dataset)
+    with open('traducao.json') as f:
+        categorical_var = json.load(f)
+    for column in df.columns:
+        if column in categorical_var.keys():
+            mode=df[column].mode()[0]
+            engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+            with engine.connect() as conn:
+                query = sql.text("""
+                UPDATE data_atributos
+                SET {column} = :mode
+                WHERE id_dataset = :id_dataset
+                AND {column} IS NULL or {column} = '0'
+                """)
+
+            params={"mode": mode, "id_dataset": id_dataset}
+            conn.execute(query, params)
+            conn.commit()
+            #acabar
+            
+            
+def set_n_average_numerical(id_dataset):
+    
+    df=query_to_dataframe('dataset_atributos','id_dataset',id_dataset)
+    with open('traducao.json') as f:
+        categorical_var = json.load(f)
+    for column in df.columns:
+        if column not in categorical_var.keys():
+            average=df[column].mean()
+            engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
+            with engine.connect() as conn:
+                query = sql.text("""
+                UPDATE data_atributos
+                SET {column} = :average
+                WHERE id_dataset = :id_dataset
+                AND {column} IS NULL or {column} = '0'
+                """)
+
+            params={"mode": average, "id_dataset": id_dataset}
+            conn.execute(query, params)
+            conn.commit()
+            #acabar

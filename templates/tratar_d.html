@@ -18,10 +18,16 @@
             <br>
             <div class="text-center">
                 <div class="d-grid gap-2 col-6 mx-auto">
-                    <a href="{{ url_for('precict_select_dataset') }}" class="btn btn-light" style="background:#BED7EA" type="button">Substituir valores em falta pela moda em colunas categoricas</a>
-                    <a href="{{ url_for('predict_select_predictions') }}" class="btn btn-light" style="background:#BED7EA" type="button">Substituir valores em falta pela media em colunas numéricas</a>
-
-                    
+                <form action="{{ url_for('tratar_d')}}" method="POST">
+                    <input type="hidden" name="action" value="moda">
+                    <input type="hidden" name="id_dataset" value="{{ id_dataset }}">
+                    <input type="submit" class="btn btn-light" style="background:#BED7EA" value="Substituir valores em falta pela moda em colunas categoricas"></input>
+                </form>
+                <form action="{{ url_for('tratar_d')}}" method="POST">
+                    <input type="hidden" name="action" value="media">
+                    <input type="hidden" name="id_dataset" value="{{ id_dataset }}">
+                    <input type="submit" class="btn btn-light" style="background:#BED7EA" value="Substituir valores em falta pela media em colunas numéricas"></input>
+                </form>
                   </div>
 
         </div>
