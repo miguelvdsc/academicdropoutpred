@@ -436,8 +436,35 @@ def tratar_d():
         print(id_dataset,action)
         if action=='moda':
             set_n_mode_categorical(id_dataset)
+            data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
+            tipos=select_type_fromdb(id_dataset)
+            data_five,columns_five=query_showdata_head(id_dataset,tipos)
+            lengc=len(columns_five)
+            dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
+            lengd=len(dd)
+            transdf=translate_categorical_variables(data_five,columns_five)
+            print(columns_five)
+            dx=query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
+            mv = dx.drop('Target', axis=1).isnull().sum().sum()
+            print(mv)
+            alt=query_to_dataframe('dataset', 'id_dataset',id_dataset)['alteracoes'].values[0]
+            return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd,mv=mv,alt=alt)
+
         elif action=='eliminar':
             set_null_elim(id_dataset)
+            data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
+            tipos=select_type_fromdb(id_dataset)
+            data_five,columns_five=query_showdata_head(id_dataset,tipos)
+            lengc=len(columns_five)
+            dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
+            lengd=len(dd)
+            transdf=translate_categorical_variables(data_five,columns_five)
+            print(columns_five)
+            dx=query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
+            mv = dx.drop('Target', axis=1).isnull().sum().sum()
+            print(mv)
+            alt=query_to_dataframe('dataset', 'id_dataset',id_dataset)['alteracoes'].values[0]
+            return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd,mv=mv,alt=alt)
         return render_template('tratar_d.html', user_type=current_user.tipo,id_dataset=id_dataset)
 if __name__ == '__main__':
     app.run()
