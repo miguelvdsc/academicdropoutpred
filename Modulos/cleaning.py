@@ -85,10 +85,10 @@ def one_hot_encode(df, json_file):
     # Load the JSON file
     with open(json_file) as f:
         traducao = json.load(f)
-
+    
     # Identify the columns to be one-hot encoded
     columns_to_encode = list(traducao.keys())
-
+    
     # Separate the non-categorical and categorical variables
     non_categorical_df = df.drop(columns_to_encode, axis=1)
     categorical_df = df[columns_to_encode]
@@ -98,7 +98,7 @@ def one_hot_encode(df, json_file):
     df_encoded = pd.DataFrame(enc.fit_transform(categorical_df).toarray(), 
                               columns=enc.get_feature_names_out(input_features=columns_to_encode))
     dump(enc, 'OneHotEncoder.joblib')
-
+    
     # Replace the encoded column names with the corresponding values from the JSON file
     for col in df_encoded.columns:
         feature, value = col.split('_')
@@ -120,13 +120,12 @@ def oneHotEncode_pred(df, json_file):
     # Load the JSON file
     with open(json_file) as f:
         traducao = json.load(f)
-
+    
     # Load the OneHotEncoder model
     enc = load('OneHotEncoder.joblib')
-
+    
     # Identify the columns to be one-hot encoded
     columns_to_encode = list(traducao.keys())
-    
     
     
     # print('DataFrame columns:', df.columns)
@@ -153,5 +152,6 @@ def oneHotEncode_pred(df, json_file):
     df_final = pd.DataFrame(np.hstack([non_categorical_df.values, df_encoded.values]), 
                             columns=list(non_categorical_df.columns) + list(df_encoded.columns))
 
+    
     return df_final
     

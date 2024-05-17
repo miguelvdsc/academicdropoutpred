@@ -10,6 +10,6 @@ assert df.shape[0] >= 3, "Dataset has less than 3 rows"
 # Introduce missing values in the "Course" column
 indices = [0, 1, 2]  # Change this to the indices of your choice
 df.loc[indices, 'Course'] = np.nan
-
+df['Course'] = df['Course'].astype('Int64')
 # Save the modified DataFrame to a new CSV file
-df.to_csv('dataset4_with_missing_values.csv', index=False)
+df.to_csv('dataset4_with_missing_values2.csv', index=False)

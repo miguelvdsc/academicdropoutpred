@@ -880,7 +880,7 @@ def set_n_mode_categorical(id_dataset):
                 UPDATE dataset_atributos
                 SET "{column}" = :mode
                 WHERE id_dataset = :id_dataset
-                AND "{column}" is NULL or "{column}" = '0'
+                AND "{column}" is NULL
                 """)
                 params={"mode": mode, "id_dataset": id_dataset}
                 conn.execute(query, params)

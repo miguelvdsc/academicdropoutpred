@@ -383,6 +383,7 @@ def precict_select_dataset():
         df_name = query_to_dataframe('dataset', 'id_dataset',id_dataset)['name'].values[0]
         
         id_dataset=predict(df,df_name)
+        print("ola")
         data,columns = select_from_table_id_one_dataset('dataset',id_dataset)
         tipos=select_type_fromdb(id_dataset)
         data_five,columns_five=query_showdata_head(id_dataset,tipos)
@@ -390,9 +391,8 @@ def precict_select_dataset():
         dd,ccc = select_from_table_id_one_dataset('dataset_atributos',id_dataset)
         lengd=len(dd)
         transdf=translate_categorical_variables(data_five,columns_five)
-        dx=query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
-        mv = dx.drop('Target', axis=1).isnull().sum().sum()
-        alt=query_to_dataframe('dataset', 'id_dataset',id_dataset)['alteracoes'].values[0]
+        mv = 0
+        alt=0
         return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd,mv=mv,alt=alt)
     
 @app.route('/predict_select_predictions',methods=['GET', 'POST'])
@@ -412,8 +412,8 @@ def predict_select_predictions():
         transdf=translate_categorical_variables(data_five,columns_five)
         print(columns_five)
         dx=query_to_dataframe('dataset_atributos', 'id_dataset', id_dataset)
-        mv = dx.drop('Target', axis=1).isnull().sum().sum()
-        alt=query_to_dataframe('dataset', 'id_dataset',id_dataset)['alteracoes'].values[0]
+        mv = 0
+        alt=0
         return render_template('show_dataset.html',user_type=current_user.tipo,data=data,columns=columns,data_five=transdf,columns_five=columns_five,lengc=lengc,lengd=lengd,mv=mv,alt=alt)
 
 

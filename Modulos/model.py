@@ -312,7 +312,7 @@ def predict(df, df_name):
         
         # df_coded = one_hot_encode(df, 'traducao.json')
         print("1-One Hot Encode applied to dataset")
-
+        
 
         # Predict the response for the dataset
         y_pred = model.predict(df_coded)
