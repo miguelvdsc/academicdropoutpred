@@ -48,12 +48,17 @@
                 <input type="hidden" name="selected_dataset" id="selected-dataset" value="{{selected_dataset}}">
                 <div class="mb-3">
                 <label for="criterion" class="form-label"><strong>Criterion</strong></label>
-                <input value="gini" name="criterion" id="criterion" class="form-control" type="text">
-                </div>
+                <select name="criterion" id="criterion" class="form-control">
+                    <option value="gini" selected>gini</option>
+                    <option value="entropy">entropy</option>
+                </select>                </div>
                 <div class="mb-3">
                 <label for="splitter" class="form-label"><strong>Splitter</strong></label>
-                <input value="best" name="splitter" id="splitter" class="form-control" type="text">
-                </div>
+                <select name="splitter" id="splitter" class="form-control">
+                  <option value="best" selected>best</option>
+                  <option value="random">random</option>
+                </select>  
+                            </div>
                 <div class="mb-3">
                 <label for="max_depth" class="form-label"><strong>Max Depth</strong></label>
                 <input value="" name="max_depth" id="max_depth" class="form-control" type="text">
