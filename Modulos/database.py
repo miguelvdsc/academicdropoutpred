@@ -43,7 +43,7 @@ def check_if_user_exists(username,password):
     """
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
-        query = sql.text(f"SELECT id FROM users WHERE name = '{username}'")
+        query = sql.text(f"SELECT id FROM users WHERE name = '{username}' and estado=1")
         result = conn.execute(query)
         data = result.fetchall()
         if len(data)==0:
@@ -821,7 +821,7 @@ def select_from_table_estado_spe(table):
     """
     engine = sql.create_engine('postgresql://postgres:admin@localhost/frontend')
     with engine.connect() as conn:
-        query = sql.text(f"SELECT id,name,tipo FROM {table} where estado=1")
+        query = sql.text(f"SELECT id,name,email,tipo FROM {table} where estado=1 order by id")
         result = conn.execute(query)
         columns = result.keys()
         data = result.fetchall()

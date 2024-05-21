@@ -46,6 +46,9 @@ def login():
         print (username,password)
         # Validate the username and password
         # This is where you should check them from your database
+        if check_if_user_exists(username,password)==False:
+            flash("Credenciais inválidas", 'danger')
+            return render_template('login.html')
         idd = check_if_user_exists(username,password)
         if idd!=False and check_pass(idd,password):
             user=user_loader(idd)
@@ -103,10 +106,10 @@ def desativar():
         
         for id in selected_ids:
             modify_estado(id)
-        columns, data = select_from_table_estado('users')
+        columns, data = select_from_table_estado_spe('users')
         return render_template('desativar.html',user_type=current_user.tipo,columns=columns, data=data)
     elif request.method == 'GET':
-        columns, data = select_from_table_estado('users')
+        columns, data = select_from_table_estado_spe('users')
         return render_template('desativar.html', columns=columns, data=data,user_type=current_user.tipo)
 
 @app.route('/changepw', methods=['GET', 'POST'])

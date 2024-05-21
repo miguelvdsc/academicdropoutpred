@@ -44,12 +44,12 @@
                 {% endwith %}
             <form action="{{ url_for('changepw') }}" method="POST">
               <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" name="password" id="password" placeholder="Introduza a password">
+                <label for="password" class="form-label">Palavra-passe</label>
+                <input type="password" required class="form-control" name="password" id="password" placeholder="Introduza a Palavra-passe">
               </div>
               <div class="mb-3">
-                <label for="confirm-password" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="Confirme a password">
+                <label for="confirm-password" class="form-label">Confirme a Palavra-passe</label>
+                <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="Confirme a Palavra-passe">
               </div>
             
               <button type="submit" style="background:#BED7EA;border-radius: 10px;" class="btn btn-light w-100">Confirmar</button>
